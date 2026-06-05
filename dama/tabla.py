@@ -55,8 +55,12 @@ class Tabla:
         self.nacrtaj_figure(proz)
         self.prikazi_tablu()
     def pomjeri(self,fig,indeks):
-        self.polozaji[fig.indeks],self.polozaji[indeks]=self.polozaji[indeks],self.polozaji[fig.indeks]
-        fig.pomjeri(indeks)
+        #ZAMJENI INDEKSE FIGURE I INDEKS MJESTA NA OKJE FIG STAJE
+        #Stari indeks fig postaje prazno mjesto
+        self.polozaji[fig.indeks],self.polozaji[indeks]=0,self.polozaji[fig.indeks]
+        #IZRACUNAJ CRTANJE FIG
+        fig.pomjeri_fig(indeks)
+
         if indeks//4==0 or indeks//4==7:
             fig.postavi_marka()
             if fig.boja==CRVENA:
@@ -64,5 +68,6 @@ class Tabla:
             elif fig.boja==PLAVA:
                 self.bijeli_marko_br+=1
         self.prikazi_tablu()
+        
     def vrati_fig(self,indeks):
         return self.polozaji[indeks]

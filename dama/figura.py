@@ -58,7 +58,7 @@ class Figura:
         pygame.draw.circle(proz,SIVA,(self.x,self.y),KVADRAT//3+2)
         pygame.draw.circle(proz,self.boja,(self.x,self.y),KVADRAT//3)
     
-    def pomjeri(self,indeks):
+    def pomjeri_fig(self,indeks):
         self.indeks=indeks
         self.rac_pozicija()
     
