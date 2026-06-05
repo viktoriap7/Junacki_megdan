@@ -6,7 +6,12 @@ class Figura:
         self.indeks=indeks 
         """ tabla4x8 """
         self.marko=False
+        self.kralj=False
         self.boja=boja
+        self.oklop=0
+        self.topuz=False
+        self.topuz_brojac=False
+        self.sarac=False
         if boja==CRVENA:
             self.pravac=1
         else:
@@ -14,6 +19,21 @@ class Figura:
         """ tabla 8x8 """
         self.x=0
         self.y=0
+    def postavi_oklop(self):
+        if self.marko==True:
+            self.oklop=2
+        else:
+            self.oklop=1
+    def postavi_sarca(self):
+        self.sarac=True
+    def postavi_marka(self):
+        self.marko=True
+    def krunisi(self):
+        self.kralj=True
+    def postavi_topuz(self):
+        self.topuz=True
+    def postavi_topuz_br(self):
+        self.topuz_brojac=True
     def __str__(self):
         boja=""
         if self.boja==CRVENA:
@@ -34,8 +54,6 @@ class Figura:
         else:
             self.x=RAZMAK_SIR+KVADRAT*((self.indeks%4)*2+1)+KVADRAT//2
         """ print("Figura: "+str(self.x)+" "+str(self.y)+"\n") """
-    def postavi_marka(self):
-        self.marko=True
     def nacrtaj(self,proz):
         pygame.draw.circle(proz,SIVA,(self.x,self.y),KVADRAT//3+2)
         pygame.draw.circle(proz,self.boja,(self.x,self.y),KVADRAT//3)
@@ -43,3 +61,4 @@ class Figura:
     def pomjeri(self,indeks):
         self.indeks=indeks
         self.rac_pozicija()
+    
