@@ -71,3 +71,14 @@ class Tabla:
         
     def vrati_fig(self,indeks):
         return self.polozaji[indeks]
+    def pojedi_fig(self,fig,tren_boja): #pokusaj pojesti figuru ako ima neka na tom mjestu
+        if fig!=0:
+            if fig.boja!=tren_boja:
+                self.polozaji[fig.indeks]=0
+                if fig.boja==PLAVA:
+                    self.bijele_fig-=1
+                elif fig.boja==CRVENA:
+                    self.crne_fig-=1
+                return True
+        return False
+            
