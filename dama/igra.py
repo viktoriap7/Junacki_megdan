@@ -121,53 +121,39 @@ class Igra:
             self.zamjeni_na_redu()
             self.tren=None
             self.lanac=False
-
+    def provjeri_dijagonale(self, fig, i, pravac):
+        """Pomocna funkcija koja provjerava dijagonale za zadati pravac kretanja"""
+        if (i//4)%2==0:  # PARNI RED
+            if i%4!=0:
+                pol=i+(pravac*4)-1
+                if 0<=pol<=31: 
+                    self.provjeri_polje(fig,pol)
+            pol=i+(pravac*4)
+            if 0<=pol<=31:
+                self.provjeri_polje(fig,pol)
+        else:  # NEPARNI RED
+            if i%4!=3:
+                pol=i+(pravac*4)+1
+                if 0<=pol<=31:
+                    self.provjeri_polje(fig,pol)
+            pol=i+(pravac*4)
+            if 0<=pol<=31:
+                self.provjeri_polje(fig, pol)
     def dobij_moguce_korake(self):
-        
-                    #U rijecniku cuva mjesto gdje ce stati: sta jede
-        self.moguca_polja={}
-        if self.na_redu==CRVENA:
-            #GRESKA: NE ZNA KOJU FIGURU DA POMJERI RACUNAR
-            #NIJE ODREDJEN TREN
-            #for i in range(32):
-                #if isinstance(self.tabla.polozaji[i],Figura) and self.tabla.polozaji[i].boja==CRVENA:
-            i=self.tren.indeks
-            if (i//4)%2==0:#PARNI RED
-                if i%4!=0:
-                    pol=i+(self.tabla.polozaji[i].pravac*4)-1
-                    if 0<=pol<=31: 
-                        self.provjeri_polje(self.tabla.polozaji[i],pol)
-                pol=i+(self.tabla.polozaji[i].pravac*4)
-                if 0<=pol<=31:
-                    self.provjeri_polje(self.tabla.polozaji[i],pol)
-            else: #NEPARNI RED
-                if i%4!=3:
-                    pol=i+(self.tabla.polozaji[i].pravac*4)+1
-                    if 0<=pol<=31:
-                        self.provjeri_polje(self.tabla.polozaji[i],pol)
-                
-                pol=i+(self.tabla.polozaji[i].pravac*4)
-                if 0<=pol<=31:
-                    self.provjeri_polje(self.tabla.polozaji[i],pol)
-        elif self.na_redu==PLAVA:
-            i=self.tren.indeks
-            if (i//4)%2==0:#PARNI RED
-                if i%4!=0:
-                    pol=i+(self.tabla.polozaji[i].pravac*4)-1
-                    if 0<=pol<=31: 
-                        self.provjeri_polje(self.tabla.polozaji[i],pol)
-                pol=i+(self.tabla.polozaji[i].pravac*4)
-                if 0<=pol<=31:
-                    self.provjeri_polje(self.tabla.polozaji[i],pol)
-            else: #NEPARNI RED
-                if i%4!=3:
-                    pol=i+(self.tabla.polozaji[i].pravac*4)+1
-                    if 0<=pol<=31: 
-                        self.provjeri_polje(self.tabla.polozaji[i],pol)
-                pol=i+(self.tabla.polozaji[i].pravac*4)
-                if 0<=pol<=31:
-                    self.provjeri_polje(self.tabla.polozaji[i],pol)
+        #U rijecniku cuva mjesto gdje ce stati: sta jede
+        self.moguca_polja = {}
+        if not self.tren:
+            print("Nije nista izabrano")
+            return
+        i=self.tren.indeks
+        osnovni_pravac=self.tren.pravac
+        #ide u osnovnom pravcu
+        self.provjeri_dijagonale(self.tren,i,osnovni_pravac)
 
+        #ide unazad
+        if self.tren.marko:
+            obrnuti_pravac=osnovni_pravac*-1
+            self.provjeri_dijagonale(self.tren,i,obrnuti_pravac)
         
                         
     def provjeri_polje(self,fig,polje):
