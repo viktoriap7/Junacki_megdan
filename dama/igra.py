@@ -2,7 +2,7 @@ import pygame
 from dama.const import *
 from dama.tabla import Tabla
 from dama.figura import Figura
-
+from dama.strukture import *
 class Igra:
     def __init__(self, proz):
         self.tren=None
@@ -10,8 +10,10 @@ class Igra:
         self.na_redu=PLAVA
         self.moguca_polja={}
         self.proz=proz
+
         self.lanac=False
         self.biranje=False
+        self.dek_moci=Dek()
     def update(self):
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
@@ -41,12 +43,8 @@ class Igra:
         if self.biranje:#kad se prikaze popup moci
             print("pop up moci prikazan")
             izabrano=self.dobij_stranu_moci_od_misa(poz)
-            if izabrano!=-1:#ako smo izabrali neku moc
-                print("\tizabrana moc "+str(izabrano))
-                self.biranje=False
-                print("\tbiranje "+str(self.biranje))
-                self.tabla.nacrtaj(self.proz)
-                pygame.display.update()
+            self.dodjeli_moc(izabrano)
+            self.upravljaj_redom()
         else:
             if self.tren:
                     if self.lanac:
@@ -152,14 +150,15 @@ class Igra:
             if any(v != 0 for v in self.moguca_polja.values()):
                 print("Postoji figura koja se moze pojest")
             else:                                 #ako nema daljeg, igra drugi igrac
-                self.zamjeni_na_redu()
-                self.tren=None
-                self.lanac=False
+                self.upravljaj_redom()
         else:                                 #ako nije pojeo nista, igra drugi igrac
+            self.upravljaj_redom()
+    
+    def upravljaj_redom(self):
+        if not self.biranje:
             self.zamjeni_na_redu()
             self.tren=None
             self.lanac=False
-    
     def provjeri_dijagonale(self, fig, i, pravac):
         """Pomocna funkcija koja provjerava dijagonale za zadati pravac kretanja"""
         if (i//4)%2==0:  # PARNI RED
@@ -314,7 +313,6 @@ class Igra:
             prvi_korak=False
 
     def nacrtaj_biranje_moci(self):
-        
         # 3. Kreiramo pravougaonik za popup
         popup_pravougaonik=pygame.Rect(POPUP_RAZMAK_SIR,POPUP_RAZMAK_VIS,POPUP_SIR,POPUP_VIS)
         
@@ -329,10 +327,32 @@ class Igra:
         
         # 7. Računamo poziciju teksta tako da bude tačno u centru našeg popup-a
         tekst_POPUP_RAZMAK_SIR=POPUP_RAZMAK_SIR+(POPUP_SIR-tekst_povrsina.get_width())//2
-        tekst_POPUP_RAZMAK_VIS=POPUP_RAZMAK_VIS+30  # Postavljamo ga malo bliže vrhu da bi ispod ostalo mesta za dugmad
+        tekst_POPUP_RAZMAK_VIS=POPUP_RAZMAK_VIS+15  # Pomjereno malo gore da ne udara u slike
         
-        # 8. Crta se tekst na prozor
+        broj_moc1=self.dek_moci.vidi_prvi()
+        broj_moc2=self.dek_moci.vidi_zadnji()
+        slike_moci={
+                1: STIT_PLAVA,
+                2: KRALJ_PLAVA,
+                3: KONJ_PLAVI
+            }
+        slika1=slike_moci.get(broj_moc1,None)
+        slika2=slike_moci.get(broj_moc2,None)
+        # Crtanje ivica oko lijevog i desnog dugmeta (da se vizuelno odvoje)
+        pygame.draw.rect(self.proz,CRNA,pygame.Rect(LIJEVO_POPUP_X,LIJEVO_POPUP_Y,DUGME_SIR_POPUP,DUGME_VIS_POPUP),2)
+        pygame.draw.rect(self.proz,CRNA,pygame.Rect(DESNO_POPUP_X,DESNO_POPUP_Y,DUGME_SIR_POPUP,DUGME_VIS_POPUP),2)
+        
         self.proz.blit(tekst_povrsina,(tekst_POPUP_RAZMAK_SIR,tekst_POPUP_RAZMAK_VIS))
+        # 8. Računanje centra i crtanje slika unutar dugmića
+        if slika1:
+            slika1_x=LIJEVO_POPUP_X+(DUGME_SIR_POPUP-SLIKA)//2
+            slika1_y=LIJEVO_POPUP_Y+(DUGME_VIS_POPUP-SLIKA)//2
+            self.proz.blit(slika1,(slika1_x,slika1_y))
+            
+        if slika2:
+            slika2_x=DESNO_POPUP_X+(DUGME_SIR_POPUP-SLIKA)//2
+            slika2_y=DESNO_POPUP_Y+(DUGME_VIS_POPUP-SLIKA)//2
+            self.proz.blit(slika2,(slika2_x,slika2_y))
         
         # 9. Ažuriramo ekran da bi se promene odmah videle
         pygame.display.update()
@@ -340,24 +360,34 @@ class Igra:
     def dobij_stranu_moci_od_misa(self,poz):
         x_mis,y_mis=poz
         
-        # 3. Definišemo tačne pozicije i dimenzije za oba dugmeta
-        dugme_sirina=POPUP_SIR//2
-        dugme_visina=POPUP_VIS
-        
-        levo_x=POPUP_RAZMAK_SIR
-        levo_y=POPUP_RAZMAK_VIS
-        
-        desno_x=POPUP_RAZMAK_SIR+dugme_sirina
-        desno_y=POPUP_RAZMAK_VIS
-        
-        # 4. Proveravamo da li je klik unutar LEVOG pravougaonika (Moć 1)
-        if levo_x<=x_mis<=levo_x+dugme_sirina and levo_y<=y_mis<=levo_y+dugme_visina:
+        # 1. Proveravamo da li je klik unutar LIJEVOG dela popup-a (Moć 1)
+        if LIJEVO_POPUP_X<=x_mis<=LIJEVO_POPUP_X+DUGME_SIR_POPUP and LIJEVO_POPUP_Y<=y_mis<=LIJEVO_POPUP_Y+DUGME_VIS_POPUP:
             return 1
             
-        # 5. Proveravamo da li je klik unutar DESNOG pravougaonika (Moć 2)
-        elif desno_x<=x_mis<=desno_x+dugme_sirina and desno_y<=y_mis<=desno_y+dugme_visina:
+        # 2. Proveravamo da li je klik unutar DESNOG dela popup-a (Moć 2)
+        elif DESNO_POPUP_X<=x_mis<=DESNO_POPUP_X+DUGME_SIR_POPUP and DESNO_POPUP_Y<=y_mis<=DESNO_POPUP_Y+DUGME_VIS_POPUP:
             return 2
             
-        # 6. Ako je kliknuto van oba dugmeta
+        # 3. Ako je kliknuto van oba dela
         else:
             return -1
+    def dodjeli_moc(self, izabrano):
+        if izabrano!=-1:#ako smo izabrali neku moc
+                print("\tizabrana moc "+str(izabrano))
+                self.biranje=False
+                print("\tbiranje "+str(self.biranje))
+
+                if izabrano==1:
+                    #skini sa deka na mjestu polozaja
+                    moc=self.dek_moci.ukloni_prvi()
+                else:
+                    moc=self.dek_moci.ukloni_zadnji()
+
+                if moc==2:
+                    print("2-krunisanje")
+                    self.tren.krunisi()
+                else:
+                    print("neka druga moc") 
+                #obrisi popup
+                self.tabla.nacrtaj(self.proz)
+                pygame.display.update()

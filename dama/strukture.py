@@ -21,8 +21,6 @@ class Stek:
 class Dek:
     def __init__(self):
         self.kapacitet=5
-        self.size=0
-        self.prvi=0
         self.pod=[None]*5
         self.polozaj=0
 
@@ -32,36 +30,25 @@ class Dek:
     def rotiraj_dek(self):
         self.polozaj=(self.polozaj+1)%self.kapacitet
         print("Rotiran dek")
-    def dodaj_prvi(self,a):
-        print("dodajem na pocetak:"+str(a))
-        
-        self.prvi=(self.prvi-1)%self.kapacitet
-        self.pod[self.prvi]=a
-        self.size+=1
-    def dodaj_zadnji(self,a):
-        print("dodajem na zadnji:"+str(a))
-        
-        self.pod[(self.prvi+self.size)%self.kapacitet]=a
-        self.size+=1
     def ukloni_prvi(self):
-        if self.size==0:
-            print("prazan dek")
-            return None
-        a=self.pod[self.prvi]
-        self.pod[self.prvi]=None
-        self.prvi=(self.prvi+1)%self.kapacitet
-        self.size-=1
+        a=self.pod[self.polozaj]
+        self.pod[self.polozaj]=random.randint(1,3)
+        #self.rotiraj_dek()
+        self.ispis()
+        return a
     def ukloni_zadnji(self):
-        if self.size==0:
-            print("prazan dek")
-            return None
-        a=self.pod[(self.prvi+self.size)%self.kapacitet]
-        self.pod[(self.prvi+self.size)%self.kapacitet]=None
-        self.size-=1
-    
+        a=self.pod[(self.polozaj-1)%self.kapacitet]
+        self.pod[(self.polozaj-1)%self.kapacitet]=random.randint(1,3)
+        #self.rotiraj_dek()
+        self.ispis()
+        return a
+    def vidi_prvi(self):
+        return self.pod[self.polozaj]
+    def vidi_zadnji(self):
+        return self.pod[(self.polozaj-1)%self.kapacitet]
     def ispis(self):
         print("kap: "+str(self.kapacitet))
-        print("[",end="")
+        print("dek: [",end="")
         for i in self.pod:
             print(str(i)+" ",end="")
         print("]")
@@ -104,4 +91,4 @@ def testiraj_dek():
     dek.ispis()
 def testitaj_stablo():
     pass
-testiraj_dek()
+#testiraj_dek()
