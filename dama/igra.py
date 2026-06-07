@@ -105,6 +105,9 @@ class Igra:
         self.tabla.pomjeri(self.tren,indeks) #pomjera figure mjenjanjem indeksa
         self.tabla.nacrtaj(self.proz)
         
+        if self.tren.indeks//4==0 or self.tren.indeks//4==7:
+            self.tren.krunisi()
+
         pojeo=self.tabla.pojedi_fig(self.moguca_polja[indeks],self.tren.boja)
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
@@ -151,7 +154,7 @@ class Igra:
         self.provjeri_dijagonale(self.tren,i,osnovni_pravac)
 
         #ide unazad
-        if self.tren.marko:
+        if self.tren.kralj:
             obrnuti_pravac=osnovni_pravac*-1
             self.provjeri_dijagonale(self.tren,i,obrnuti_pravac)
         

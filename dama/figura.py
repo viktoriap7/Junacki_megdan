@@ -55,9 +55,47 @@ class Figura:
             self.x=RAZMAK_SIR+KVADRAT*((self.indeks%4)*2+1)+KVADRAT//2
         """ print("Figura: "+str(self.x)+" "+str(self.y)+"\n") """
     def nacrtaj(self,proz):
-        pygame.draw.circle(proz,SIVA,(self.x,self.y),KVADRAT//3+2)
-        pygame.draw.circle(proz,self.boja,(self.x,self.y),KVADRAT//3)
-    
+
+        slika=None
+        if self.topuz:
+            if self.boja==PLAVA:
+                slika=TOPUZ_PLAVA
+            else:
+                slika=TOPUZ_CRVENA
+
+        elif self.oklop>0:
+            if self.boja==PLAVA:
+                slika=STIT_PLAVA
+            else:
+                slika=STIT_CRVENA
+
+        elif self.sarac:
+            if self.boja==PLAVA:
+                slika=KONJ_PLAVI
+            else:
+                slika=KONJ_CRVENI
+
+        elif self.kralj:
+            if self.boja==PLAVA:
+                slika=KRALJ_PLAVA
+            else:
+                slika=KRALJ_CRVENA
+        
+        elif self.marko:
+            pygame.draw.circle(proz,ZUTA,(self.x,self.y),KVADRAT//3+4)
+            if self.boja==PLAVA:
+                slika=MARKO_PLAVI
+            else:
+                slika=MARKO_CRVENI
+        
+        if slika:    
+            proz.blit(slika, (self.x - slika.get_width() // 2 -1, self.y - slika.get_height() // 2 -1))
+        else:
+            pygame.draw.circle(proz,SIVA,(self.x,self.y),KVADRAT//3+2)
+            pygame.draw.circle(proz,self.boja,(self.x,self.y),KVADRAT//3)
+        
+
+
     def pomjeri_fig(self,indeks):
         self.indeks=indeks
         self.rac_pozicija()
