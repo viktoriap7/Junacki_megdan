@@ -6,7 +6,7 @@ class Figura:
         self.indeks=indeks 
         """ tabla4x8 """
         self.marko=False
-        self.kralj=False
+        self.kralj=True
         self.boja=boja
         self.oklop=0
         self.topuz=False

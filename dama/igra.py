@@ -97,7 +97,25 @@ class Igra:
                 else:
                     x=RAZMAK_SIR+KVADRAT*((polje%4)*2+1)+KVADRAT//2
                 pygame.draw.circle(self.proz,ZELENA,(x,y),10)
+    def dobij_moguce_korake(self):
+        #U rijecniku cuva mjesto gdje ce stati: sta jede
+        self.moguca_polja = {}
+        if not self.tren:
+            print("Nije nista izabrano")
+            return
+        i=self.tren.indeks
+        osnovni_pravac=self.tren.pravac
+        #ide u osnovnom pravcu
 
+        #obicne fig
+        if not self.tren.kralj:
+            self.provjeri_dijagonale(self.tren,i,osnovni_pravac)
+        else:
+        #vise polja i drugi pravac za kralja
+            obrnuti_pravac=osnovni_pravac*-1
+            self.provjeri_dijagonale_kralja(self.tren,i,osnovni_pravac)
+            self.provjeri_dijagonale_kralja(self.tren,i,obrnuti_pravac)
+            
     def pokusaj_pomjeriti(self,indeks):
         print("korak na "+str(indeks))
         #self.pokusaj_pomjeriti(indeks)
@@ -124,6 +142,7 @@ class Igra:
             self.zamjeni_na_redu()
             self.tren=None
             self.lanac=False
+    
     def provjeri_dijagonale(self, fig, i, pravac):
         """Pomocna funkcija koja provjerava dijagonale za zadati pravac kretanja"""
         if (i//4)%2==0:  # PARNI RED
@@ -141,23 +160,7 @@ class Igra:
                     self.provjeri_polje(fig,pol)
             pol=i+(pravac*4)
             if 0<=pol<=31:
-                self.provjeri_polje(fig, pol)
-    def dobij_moguce_korake(self):
-        #U rijecniku cuva mjesto gdje ce stati: sta jede
-        self.moguca_polja = {}
-        if not self.tren:
-            print("Nije nista izabrano")
-            return
-        i=self.tren.indeks
-        osnovni_pravac=self.tren.pravac
-        #ide u osnovnom pravcu
-        self.provjeri_dijagonale(self.tren,i,osnovni_pravac)
-
-        #ide unazad
-        if self.tren.kralj:
-            obrnuti_pravac=osnovni_pravac*-1
-            self.provjeri_dijagonale(self.tren,i,obrnuti_pravac)
-        
+                self.provjeri_polje(fig, pol)    
                         
     def provjeri_polje(self,fig,polje):
         if self.tabla.polozaji[polje]==0:
@@ -220,4 +223,75 @@ class Igra:
          """
         if  self.tabla.polozaji[polje]==0:
             self.moguca_polja[polje]=self.tabla.polozaji[staro_polje]
-           
+    
+    def provjeri_dijagonale_kralja(self,fig,i,pravac):
+        if (i//4)%2==0:
+            if i%4!=0:
+                self.provjeri_kralja_linijski(fig,i,pravac,-1)  #lijevo
+            self.provjeri_kralja_linijski(fig,i,pravac,0)       #desno
+        else:
+            if i%4!=3:
+                self.provjeri_kralja_linijski(fig,i,pravac,1)   #desno
+            self.provjeri_kralja_linijski(fig,i,pravac,0)       #lijevo
+
+    def provjeri_kralja_linijski(self,fig,i,pravac,bocno):
+        trenutno=i
+        #bira na koju stranu ide i tako ide do kraja
+        smer_desno=True
+        if (i//4)%2==0 and bocno==-1:
+            smer_desno=False
+        elif (i//4)%2==1 and bocno==0:
+            smer_desno=False
+
+        prvi_korak=True
+        while True:
+            if (trenutno//4)%2==0:  #Parni red
+                if not smer_desno and trenutno%4==0:
+                    #ako ide lijevo i kol=0 ispasce sa table 
+                    break
+                if smer_desno:
+                    polje=trenutno+(pravac*4)
+                    #ide desno u parnom redu, ostaje u istoj koloni  
+                else:
+                    polje=trenutno+(pravac*4)-1
+                    #ide lijevo u parnom redu, mijenja kolonu
+            else:   #Neparni red
+                if smer_desno and trenutno%4==3:
+                    break
+                if smer_desno:
+                    polje=trenutno+(pravac*4)+1  
+                else:
+                    polje=trenutno+(pravac*4)
+
+            if not (0<=polje<=31):
+                break
+
+            if self.tabla.polozaji[polje]==0:
+                #ako je prazno polje moze stati
+                self.moguca_polja[polje]=0
+            else:
+                if prvi_korak:
+                    #ako odma do sebe ima figuru protivnika
+                    if fig.boja!=self.tabla.polozaji[polje].boja:
+                        #racuna gdje je polje iza protivnika
+                        if (polje//4)%2==0:
+                            #protivnik u parnom redu
+                            if not smer_desno and polje%4==0:
+                                break
+                            if smer_desno:
+                                polje_iza=polje+(pravac*4)
+                            else:
+                                polje_iza=polje+(pravac*4)-1
+                        else:
+                            #protivnik u neparnom redu
+                            if smer_desno and polje%4==3:
+                                break
+                            polje_iza=polje+(pravac*4)+1 if smer_desno else polje+(pravac*4)
+
+                        if 0<=polje_iza<=31:
+                            if self.tabla.polozaji[polje_iza]==0:
+                                self.moguca_polja[polje_iza]=self.tabla.polozaji[polje]
+                break
+            #uzima novo polje da vidi da li moze jos iza njega da se krece
+            trenutno=polje
+            prvi_korak=False
