@@ -11,6 +11,7 @@ class Igra:
         self.moguca_polja={}
         self.proz=proz
         self.lanac=False
+        self.biranje=False
     def update(self):
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
@@ -37,42 +38,57 @@ class Igra:
             return -1
 
     def odabir_misem(self,poz):
-        if self.tren:
-                if self.lanac:
-                    indeks=self.dobij_indeks_od_misa(poz)
-                    if indeks in self.moguca_polja and self.moguca_polja[indeks]!=0:
-                        self.pokusaj_pomjeriti(indeks)
+        if self.biranje:#kad se prikaze popup moci
+            print("pop up moci prikazan")
+            izabrano=self.dobij_stranu_moci_od_misa(poz)
+            if izabrano!=-1:#ako smo izabrali neku moc
+                print("\tizabrana moc "+str(izabrano))
+                self.biranje=False
+                print("\tbiranje "+str(self.biranje))
+                self.tabla.nacrtaj(self.proz)
+                pygame.display.update()
+        else:
+            if self.tren:
+                    if self.lanac:
+                        indeks=self.dobij_indeks_od_misa(poz)
+                        if indeks in self.moguca_polja and self.moguca_polja[indeks]!=0:
+                            self.pokusaj_pomjeriti(indeks)
 
-                else:    
-                    print("vec je nesto izabrano "+str(self.tren)+" "+str(self.tren.indeks))
-                    indeks=self.dobij_indeks_od_misa(poz)
-                    print("Indeks: "+str(indeks))
-                    print("moguci koraci:"+str(self.moguca_polja))
-                    if indeks!=-1 and self.tabla.polozaji[indeks]!=0:   #selektovanje druge fig
-                        if self.tabla.polozaji[indeks].boja==self.tren.boja:
-                            print("promjena odabranog")
-                            self.tren=self.tabla.polozaji[indeks]
-    
+                    else:    
+                        print("vec je nesto izabrano "+str(self.tren)+" "+str(self.tren.indeks))
+                        indeks=self.dobij_indeks_od_misa(poz)
+                        print("Indeks: "+str(indeks))
+                        print("moguci koraci:"+str(self.moguca_polja))
+                        if indeks!=-1 and self.tabla.polozaji[indeks]!=0:   #selektovanje druge fig
+                            if self.tabla.polozaji[indeks].boja==self.tren.boja:
+                                print("promjena odabranog")
+                                self.tren=self.tabla.polozaji[indeks]
+        
+                                self.tabla.nacrtaj(self.proz)
+                                pygame.display.update()
+                                self.nacrtaj_moguce_korake()
+                        elif indeks in self.moguca_polja:           #pomjeranje fig
+                            self.pokusaj_pomjeriti(indeks)
+                            if self.biranje:                
+                                self.nacrtaj_biranje_moci()
+
+                        else:                                       #odselektovanje
+                            self.tren=None
                             self.tabla.nacrtaj(self.proz)
                             pygame.display.update()
-                            self.nacrtaj_moguce_korake()
-                    elif indeks in self.moguca_polja:           #pomjeranje fig
-                        self.pokusaj_pomjeriti(indeks)
-                    else:                                       #odselektovanje
-                        self.tren=None
-                        self.tabla.nacrtaj(self.proz)
-                        pygame.display.update()
-                    print("Tren: "+str(self.tren)+" na redu:"+str(self.na_redu))
-        else:
-            print("nema nista izabrano")
-            indeks=self.dobij_indeks_od_misa(poz)
-            if indeks!=-1 and self.tabla.polozaji[indeks]!=0:
-                if self.tabla.polozaji[indeks].boja==self.na_redu:
-                    self.tren=self.tabla.polozaji[indeks]
-                    print("izabran "+str(self.tren)+" "+str(self.tren.indeks))
-                    self.nacrtaj_moguce_korake()
-            pygame.display.update()
+                        print("Tren: "+str(self.tren)+" na redu:"+str(self.na_redu))
+            else:
+                print("nema nista izabrano")
+                indeks=self.dobij_indeks_od_misa(poz)
+                if indeks!=-1 and self.tabla.polozaji[indeks]!=0:
+                    if self.tabla.polozaji[indeks].boja==self.na_redu:
+                        self.tren=self.tabla.polozaji[indeks]
+                        print("izabran "+str(self.tren)+" "+str(self.tren.indeks))
+                        self.nacrtaj_moguce_korake()
+                pygame.display.update()
     def nacrtaj_moguce_korake(self):
+        
+        self.tren.ispisi_atribute(self.proz)
         print("Izabrana fig crtanje:"+str(self.tren)+" na mjestu "+str(self.tren.indeks))
         self.dobij_moguce_korake()
         print("crtanje Moguci koraci:"+str(self.moguca_polja))
@@ -125,7 +141,8 @@ class Igra:
         
         if self.tren.indeks//4==0 or self.tren.indeks//4==7:
             self.tren.krunisi()
-
+        if self.tren.indeks in self.tabla.oranje:
+            self.biranje=True
         pojeo=self.tabla.pojedi_fig(self.moguca_polja[indeks],self.tren.boja)
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
@@ -165,7 +182,7 @@ class Igra:
     def provjeri_polje(self,fig,polje):
         if self.tabla.polozaji[polje]==0:
             self.moguca_polja[polje]=0
-            print("prazno na indeksu "+str(polje))
+            #print("prazno na indeksu "+str(polje))
         else:
             if fig.boja==self.tabla.polozaji[polje].boja:
                 print("ista boja na indeksu "+str(polje))
@@ -295,3 +312,52 @@ class Igra:
             #uzima novo polje da vidi da li moze jos iza njega da se krece
             trenutno=polje
             prvi_korak=False
+
+    def nacrtaj_biranje_moci(self):
+        
+        # 3. Kreiramo pravougaonik za popup
+        popup_pravougaonik=pygame.Rect(POPUP_RAZMAK_SIR,POPUP_RAZMAK_VIS,POPUP_SIR,POPUP_VIS)
+        
+        # 4. Crta se unutrašnjost (SIVA pozadina)
+        pygame.draw.rect(self.proz,SIVA,popup_pravougaonik)
+        
+        # 5. Crta se ivica (CRNA boja, debljina ivice 4 piksela)
+        pygame.draw.rect(self.proz,CRNA,popup_pravougaonik,4)
+        
+        # 6. Renderujemo tekst koristeći tvoj FONT i BIJELA slova
+        tekst_povrsina=FONT.render("Izaberite moc",True,BIJELA)
+        
+        # 7. Računamo poziciju teksta tako da bude tačno u centru našeg popup-a
+        tekst_POPUP_RAZMAK_SIR=POPUP_RAZMAK_SIR+(POPUP_SIR-tekst_povrsina.get_width())//2
+        tekst_POPUP_RAZMAK_VIS=POPUP_RAZMAK_VIS+30  # Postavljamo ga malo bliže vrhu da bi ispod ostalo mesta za dugmad
+        
+        # 8. Crta se tekst na prozor
+        self.proz.blit(tekst_povrsina,(tekst_POPUP_RAZMAK_SIR,tekst_POPUP_RAZMAK_VIS))
+        
+        # 9. Ažuriramo ekran da bi se promene odmah videle
+        pygame.display.update()
+        
+    def dobij_stranu_moci_od_misa(self,poz):
+        x_mis,y_mis=poz
+        
+        # 3. Definišemo tačne pozicije i dimenzije za oba dugmeta
+        dugme_sirina=POPUP_SIR//2
+        dugme_visina=POPUP_VIS
+        
+        levo_x=POPUP_RAZMAK_SIR
+        levo_y=POPUP_RAZMAK_VIS
+        
+        desno_x=POPUP_RAZMAK_SIR+dugme_sirina
+        desno_y=POPUP_RAZMAK_VIS
+        
+        # 4. Proveravamo da li je klik unutar LEVOG pravougaonika (Moć 1)
+        if levo_x<=x_mis<=levo_x+dugme_sirina and levo_y<=y_mis<=levo_y+dugme_visina:
+            return 1
+            
+        # 5. Proveravamo da li je klik unutar DESNOG pravougaonika (Moć 2)
+        elif desno_x<=x_mis<=desno_x+dugme_sirina and desno_y<=y_mis<=desno_y+dugme_visina:
+            return 2
+            
+        # 6. Ako je kliknuto van oba dugmeta
+        else:
+            return -1

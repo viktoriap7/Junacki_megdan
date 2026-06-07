@@ -6,7 +6,7 @@ class Figura:
         self.indeks=indeks 
         """ tabla4x8 """
         self.marko=False
-        self.kralj=True
+        self.kralj=False
         self.boja=boja
         self.oklop=0
         self.topuz=False
@@ -76,6 +76,7 @@ class Figura:
                 slika=KONJ_CRVENI
 
         elif self.kralj:
+            pygame.draw.circle(proz,BIJELA,(self.x,self.y),KVADRAT//3+4)
             if self.boja==PLAVA:
                 slika=KRALJ_PLAVA
             else:
@@ -94,8 +95,24 @@ class Figura:
             pygame.draw.circle(proz,SIVA,(self.x,self.y),KVADRAT//3+2)
             pygame.draw.circle(proz,self.boja,(self.x,self.y),KVADRAT//3)
         
+    def ispisi_atribute(self,proz):
+        text="Figura:"
+        if self.marko:
+            text+=" Kraljević Marko"
+        elif self.kralj:
+            text+=" Kraljević"
+        else:
+            text+=" Junak"
+        text+="\n"
+        if self.topuz:
+            text+="-Ima topuz\n"
+        if self.sarac:
+            text+="-Ima sarca\n"
+        #if self.oklop>0:
 
-
+        sve=FONT.render(text,True,CRNA)
+        proz.blit(sve,(ATRIBUTI_SIR,ATRIBUTI_VIS))
+        pygame.display.update()
     def pomjeri_fig(self,indeks):
         self.indeks=indeks
         self.rac_pozicija()

@@ -9,6 +9,7 @@ class Tabla:
         self.crne_fig=12
         self.bijeli_marko_br=0
         self.crni_marko_br=0
+        self.oranje=[12,19]
     def prikazi_tablu(self):
         print("Stanje Table")
         for red in range(BR_RED):
@@ -26,6 +27,8 @@ class Tabla:
             for kol in range(BR_KOL):
                 if((red+kol)%2==0):
                     boja=CRNA
+                    if (red==3 and kol==1) or(red==4 and kol==6):
+                        boja=SMEDJA
                 else:
                     boja=BIJELA
                 
