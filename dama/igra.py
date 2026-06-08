@@ -25,6 +25,7 @@ class Igra:
         else:
             self.na_redu=CRVENA
             print("Na redu: crveni"+str(self.na_redu) )
+        self.dek_moci.rotiraj_dek()
             
     def dobij_indeks_od_misa(self,poz): #poz=koordinate klika misa
         x,y=poz
@@ -57,7 +58,12 @@ class Igra:
                         indeks=self.dobij_indeks_od_misa(poz)
                         print("Indeks: "+str(indeks))
                         print("moguci koraci:"+str(self.moguca_polja))
-                        if indeks!=-1 and self.tabla.polozaji[indeks]!=0:   #selektovanje druge fig
+                        
+                        if indeks in self.moguca_polja:           #pomjeranje fig
+                            self.pokusaj_pomjeriti(indeks)
+                            if self.biranje:                
+                                self.nacrtaj_biranje_moci()
+                        elif indeks!=-1 and self.tabla.polozaji[indeks]!=0:   #selektovanje druge fig
                             if self.tabla.polozaji[indeks].boja==self.tren.boja:
                                 print("promjena odabranog")
                                 self.tren=self.tabla.polozaji[indeks]
@@ -65,11 +71,6 @@ class Igra:
                                 self.tabla.nacrtaj(self.proz)
                                 pygame.display.update()
                                 self.nacrtaj_moguce_korake()
-                        elif indeks in self.moguca_polja:           #pomjeranje fig
-                            self.pokusaj_pomjeriti(indeks)
-                            if self.biranje:                
-                                self.nacrtaj_biranje_moci()
-
                         else:                                       #odselektovanje
                             self.tren=None
                             self.tabla.nacrtaj(self.proz)
@@ -137,12 +138,18 @@ class Igra:
     def pokusaj_pomjeriti(self,indeks):
         print("korak na "+str(indeks))
         #self.pokusaj_pomjeriti(indeks)
+        fig_za_jedednje=self.moguca_polja[indeks]
+        #ako namjestu gdje stajemo postoji fig, iskoristen je topuz
+        if self.moguca_polja[indeks]!=0:
+            if self.tabla.polozaji[indeks]!=0:
+                if self.tren.topuz_brojac>0:
+                    self.tren.topuz_brojac-=1
         
+        pojeo=self.tabla.pojedi_fig(fig_za_jedednje,self.tren.boja)
         self.tabla.pomjeri(self.tren,indeks) #pomjera figure mjenjanjem indeksa
         self.tabla.nacrtaj(self.proz)
         if self.tren.indeks in self.tabla.oranje:
             self.biranje=True
-        pojeo=self.tabla.pojedi_fig(self.moguca_polja[indeks],self.tren.boja)
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
         if pojeo:                           #ako igrac pojede nesto,ispitaj da li moze lancano
@@ -156,8 +163,11 @@ class Igra:
             self.upravljaj_redom()
     
     def upravljaj_redom(self):
+        #self.tren=Figura
         if not self.biranje:
             self.zamjeni_na_redu()
+            if self.tren.topuz:
+                self.tren.topuz_brojac=1
             self.tren=None
             self.lanac=False
     def provjeri_dijagonale(self, fig, i, pravac):
@@ -192,7 +202,7 @@ class Igra:
                     self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
             else:
                 print("razlicita boja na indeksu "+str(polje))
-                if fig.topuz_brojac==True:
+                if fig.topuz_brojac>0:
                     print("\tima topuz ")
                     #U rijecniku cuva mjesto gdje ce stati: sta jede
                     self.moguca_polja[polje]=self.tabla.polozaji[polje]
@@ -333,7 +343,7 @@ class Igra:
         broj_moc1=self.dek_moci.vidi_prvi()
         broj_moc2=self.dek_moci.vidi_zadnji()
         slike_moci={
-                1: STIT_PLAVA,
+                1: TOPUZ_PLAVA,
                 2: KRALJ_PLAVA,
                 3: KONJ_PLAVI
             }
@@ -384,7 +394,10 @@ class Igra:
                 else:
                     moc=self.dek_moci.ukloni_zadnji()
                 #self.tren=Figura()
-                if moc==2:
+                if moc==1:
+                    print("\t1-topuz")
+                    self.tren.postavi_topuz()
+                elif moc==2:
                     print("\t2-krunisanje")
                     self.tren.krunisi()
                 elif moc==3:

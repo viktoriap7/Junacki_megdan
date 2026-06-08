@@ -10,7 +10,7 @@ class Figura:
         self.boja=boja
         self.oklop=0
         self.topuz=False
-        self.topuz_brojac=False
+        self.topuz_brojac=0
         self.sarac=False
         if boja==CRVENA:
             self.pravac=1
@@ -36,8 +36,9 @@ class Figura:
         self.kralj=True
     def postavi_topuz(self):
         self.topuz=True
+        self.topuz_brojac=1
     def postavi_topuz_br(self):
-        self.topuz_brojac=True
+        self.topuz_brojac=1
     def __str__(self):
         boja=""
         if self.boja==CRVENA:
@@ -100,7 +101,7 @@ class Figura:
         else:
             pygame.draw.circle(proz,SIVA,(self.x,self.y),KVADRAT//3+2)
             pygame.draw.circle(proz,self.boja,(self.x,self.y),KVADRAT//3)
-        
+    
     def ispisi_atribute(self,proz):
         text="Figura:"
         if self.marko:
@@ -114,10 +115,14 @@ class Figura:
             text+="-Ima topuz\n"
         if self.sarac:
             text+="-Ima sarca\n"
-        #if self.oklop>0:
-
-        sve=FONT.render(text,True,CRNA)
-        proz.blit(sve,(ATRIBUTI_SIR,ATRIBUTI_VIS))
+        
+        linije=text.split('\n')
+        trenutno_y=ATRIBUTI_VIS
+        for linija in linije:
+            if linija!="":
+                sve=FONT.render(linija,True,BIJELA)
+                proz.blit(sve,(ATRIBUTI_SIR,trenutno_y))
+                trenutno_y+=sve.get_height()+5
         pygame.display.update()
     def pomjeri_fig(self,indeks):
         self.indeks=indeks

@@ -80,7 +80,8 @@ class Tabla:
     def pomjeri(self,fig,indeks):
         #ZAMJENI INDEKSE FIGURE I INDEKS MJESTA NA OKJE FIG STAJE
         #Stari indeks fig postaje prazno mjesto
-        self.polozaji[fig.indeks],self.polozaji[indeks]=0,self.polozaji[fig.indeks]
+        self.polozaji[fig.indeks] = 0
+        self.polozaji[indeks] = fig
         #IZRACUNAJ CRTANJE FIG
         fig.pomjeri_fig(indeks)
 
@@ -102,6 +103,8 @@ class Tabla:
                     self.bijele_fig-=1
                 elif fig.boja==CRVENA:
                     self.crne_fig-=1
+                
+                self.polozaji[fig.indeks]=0
                 return True
         return False
             
