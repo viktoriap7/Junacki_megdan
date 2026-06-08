@@ -85,7 +85,7 @@ class Tabla:
         fig.pomjeri_fig(indeks)
 
         if indeks//4==0 or indeks//4==7:
-            fig.postavi_marka()
+            fig.krunisi()
             if fig.boja==CRVENA:
                 self.crni_marko_br+=1
             elif fig.boja==PLAVA:

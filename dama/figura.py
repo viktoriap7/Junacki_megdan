@@ -29,6 +29,10 @@ class Figura:
     def postavi_marka(self):
         self.marko=True
     def krunisi(self):
+        print("--- DETEKTIVSKI ISPIS ---")
+        print("Funkcija krunisi() je UPRAVO POKRENUTA za indeks: " + str(self.indeks))
+        print("Pre krunisanja, self.kralj je: " + str(self.kralj))
+        print("Pre krunisanja, self.marko je: " + str(self.marko))
         self.kralj=True
     def postavi_topuz(self):
         self.topuz=True
@@ -42,6 +46,8 @@ class Figura:
             boja="p"
         if self.marko:
             return boja+";m"
+        if self.kralj:
+            return boja+";k"
         else:
             return boja
     def __repr__(self):
@@ -63,26 +69,26 @@ class Figura:
             else:
                 slika=TOPUZ_CRVENA
 
-        elif self.oklop>0:
+        if self.oklop>0:
             if self.boja==PLAVA:
                 slika=STIT_PLAVA
             else:
                 slika=STIT_CRVENA
 
-        elif self.sarac:
+        if self.sarac:
             if self.boja==PLAVA:
                 slika=KONJ_PLAVI
             else:
                 slika=KONJ_CRVENI
 
-        elif self.kralj:
+        if self.kralj:
             pygame.draw.circle(proz,BIJELA,(self.x,self.y),KVADRAT//3+4)
             if self.boja==PLAVA:
                 slika=KRALJ_PLAVA
             else:
                 slika=KRALJ_CRVENA
         
-        elif self.marko:
+        if self.marko:
             pygame.draw.circle(proz,ZUTA,(self.x,self.y),KVADRAT//3+4)
             if self.boja==PLAVA:
                 slika=MARKO_PLAVI

@@ -129,16 +129,17 @@ class Igra:
             obrnuti_pravac=osnovni_pravac*-1
             self.provjeri_dijagonale_kralja(self.tren,i,osnovni_pravac)
             self.provjeri_dijagonale_kralja(self.tren,i,obrnuti_pravac)
-            
+            if self.tren.sarac or self.tren.topuz_brojac: # koristi tvoj naziv atributa iz figure
+                print("Kralj ima relikviju (Šarac/Topuz) - računam posebne korake...")
+                self.provjeri_dijagonale(self.tren, i, osnovni_pravac)
+                self.provjeri_dijagonale(self.tren, i, obrnuti_pravac)
+
     def pokusaj_pomjeriti(self,indeks):
         print("korak na "+str(indeks))
         #self.pokusaj_pomjeriti(indeks)
         
         self.tabla.pomjeri(self.tren,indeks) #pomjera figure mjenjanjem indeksa
         self.tabla.nacrtaj(self.proz)
-        
-        if self.tren.indeks//4==0 or self.tren.indeks//4==7:
-            self.tren.krunisi()
         if self.tren.indeks in self.tabla.oranje:
             self.biranje=True
         pojeo=self.tabla.pojedi_fig(self.moguca_polja[indeks],self.tren.boja)
@@ -165,20 +166,20 @@ class Igra:
             if i%4!=0:
                 pol=i+(pravac*4)-1
                 if 0<=pol<=31: 
-                    self.provjeri_polje(fig,pol)
+                    self.provjeri_polje(fig,pol,pravac)
             pol=i+(pravac*4)
             if 0<=pol<=31:
-                self.provjeri_polje(fig,pol)
+                self.provjeri_polje(fig,pol,pravac)
         else:  # NEPARNI RED
             if i%4!=3:
                 pol=i+(pravac*4)+1
                 if 0<=pol<=31:
-                    self.provjeri_polje(fig,pol)
+                    self.provjeri_polje(fig,pol,pravac)
             pol=i+(pravac*4)
             if 0<=pol<=31:
-                self.provjeri_polje(fig, pol)    
+                self.provjeri_polje(fig, pol,pravac)    
                         
-    def provjeri_polje(self,fig,polje):
+    def provjeri_polje(self,fig,polje,pravac):
         if self.tabla.polozaji[polje]==0:
             self.moguca_polja[polje]=0
             #print("prazno na indeksu "+str(polje))
@@ -188,7 +189,7 @@ class Igra:
                 if fig.sarac==True:
                     print("\tima sarca ")
                     boja_nove_fig=self.tabla.polozaji[polje].boja
-                    self.moguce_polje_iza(fig,boja_nove_fig,polje)
+                    self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
             else:
                 print("razlicita boja na indeksu "+str(polje))
                 if fig.topuz_brojac==True:
@@ -197,35 +198,35 @@ class Igra:
                     self.moguca_polja[polje]=self.tabla.polozaji[polje]
                 
                 boja_nove_fig=self.tabla.polozaji[polje].boja
-                self.moguce_polje_iza(fig,boja_nove_fig,polje)
+                self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
         
-    def moguce_polje_iza(self,fig,boja_nove_fig,polje):
+    def moguce_polje_iza(self,fig,boja_nove_fig,polje,pravac):
         print("provjera polja iza")
         if (polje//4)%2==0: #Parni red
             print("\t parni red")
             if polje%4!=0:
                 if abs(fig.indeks-polje)==4:
-                    pol=polje +(fig.pravac*4)-1
+                    pol=polje +(pravac*4)-1
                     if 0<=pol<=31:
-                        print("\t pomjeraj 4 "+str((fig.pravac*4)-1)+"="+str(pol))
+                        print("\t pomjeraj 4 "+str((pravac*4)-1)+"="+str(pol))
                         self.provjeri_polje_iza(fig,boja_nove_fig,pol,polje)
                 else:
-                    pol=polje +(fig.pravac*4)
+                    pol=polje +(pravac*4)
                     if 0<=pol<=31:
-                        print("\t pomjeraj nije 4 "+str((fig.pravac*4))+"="+str(pol))
+                        print("\t pomjeraj nije 4 "+str((pravac*4))+"="+str(pol))
                         self.provjeri_polje_iza(fig,boja_nove_fig,pol,polje)
         else: #neparni red
             print("\t neparni red")
             if polje%4!=3:
                 if abs(fig.indeks-polje)==4:
-                    pol=polje +(fig.pravac*4)+1
+                    pol=polje +(pravac*4)+1
                     if 0<=pol<=31:
-                        print("\t pomjeraj 4 "+str((fig.pravac*4)+1)+"="+str(pol))
+                        print("\t pomjeraj 4 "+str((pravac*4)+1)+"="+str(pol))
                         self.provjeri_polje_iza(fig,boja_nove_fig,pol,polje)
                 else:
-                    pol=polje +(fig.pravac*4)
+                    pol=polje +(pravac*4)
                     if 0<=pol<=31:
-                        print("\t pomjeraj nije 4 "+str((fig.pravac*4))+"="+str(polje +(pol)))
+                        print("\t pomjeraj nije 4 "+str((pravac*4))+"="+str(polje +(pol)))
                         self.provjeri_polje_iza(fig,boja_nove_fig,pol,polje)
 
     def provjeri_polje_iza(self,fig,boja_nove_fig,polje,staro_polje):
@@ -382,10 +383,13 @@ class Igra:
                     moc=self.dek_moci.ukloni_prvi()
                 else:
                     moc=self.dek_moci.ukloni_zadnji()
-
+                #self.tren=Figura()
                 if moc==2:
-                    print("2-krunisanje")
+                    print("\t2-krunisanje")
                     self.tren.krunisi()
+                elif moc==3:
+                    print("\t3-sarac")
+                    self.tren.postavi_sarca()
                 else:
                     print("neka druga moc") 
                 #obrisi popup

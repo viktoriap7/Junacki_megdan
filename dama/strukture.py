@@ -25,20 +25,20 @@ class Dek:
         self.polozaj=0
 
         for i in range(5):
-            self.pod[i]=2
+            self.pod[i]=random.randint(2,3)
             #self.pod[i]=random.randint(1,3)
     def rotiraj_dek(self):
         self.polozaj=(self.polozaj+1)%self.kapacitet
         print("Rotiran dek")
     def ukloni_prvi(self):
         a=self.pod[self.polozaj]
-        self.pod[self.polozaj]=random.randint(1,3)
+        self.pod[self.polozaj]=random.randint(2,3)
         #self.rotiraj_dek()
         self.ispis()
         return a
     def ukloni_zadnji(self):
         a=self.pod[(self.polozaj-1)%self.kapacitet]
-        self.pod[(self.polozaj-1)%self.kapacitet]=random.randint(1,3)
+        self.pod[(self.polozaj-1)%self.kapacitet]=random.randint(2,3)
         #self.rotiraj_dek()
         self.ispis()
         return a
