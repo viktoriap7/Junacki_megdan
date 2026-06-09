@@ -29,6 +29,12 @@ class Igra:
             
     def dobij_indeks_od_misa(self,poz): #poz=koordinate klika misa
         x,y=poz
+        if self.tren and self.tren.oklop and self.tren.boja == self.na_redu:
+            if ATRIBUTI_SIR<=x<=ATRIBUTI_SIR+ATRIBUTI_DUGME_SIR and ATRIBUTI_STIT_VIS<=y<=ATRIBUTI_STIT_VIS+ATRIBUTI_DUGME_VIS:
+                return -2
+        if self.tren and self.tren.obrve and self.tren.boja == self.na_redu:
+            if ATRIBUTI_SIR<=x<=ATRIBUTI_SIR+ATRIBUTI_DUGME_SIR and ATRIBUTI_OKO_VIS<=y<=ATRIBUTI_OKO_VIS+ATRIBUTI_DUGME_VIS:
+                return -3
         x=x-RAZMAK_SIR
         x=x//KVADRAT
         y=y-RAZMAK_VIS
@@ -59,7 +65,19 @@ class Igra:
                         print("Indeks: "+str(indeks))
                         print("moguci koraci:"+str(self.moguca_polja))
                         
-                        if indeks in self.moguca_polja:           #pomjeranje fig
+                        if indeks==-2:                             #pritisnuto dugme oklopa
+                            self.tren.upotrebi_oklop()
+                            self.upravljaj_redom()
+                            self.tabla.nacrtaj(self.proz)
+                            pygame.display.update()
+                            return
+                        if indeks==-3:
+                            self.tabla.promadji_najblizu(self.tren)
+                            self.upravljaj_redom()
+                            self.tabla.nacrtaj(self.proz)
+                            pygame.display.update()
+                            return
+                        elif indeks in self.moguca_polja:           #pomjeranje fig
                             self.pokusaj_pomjeriti(indeks)
                             if self.biranje:                
                                 self.nacrtaj_biranje_moci()
@@ -71,6 +89,7 @@ class Igra:
                                 self.tabla.nacrtaj(self.proz)
                                 pygame.display.update()
                                 self.nacrtaj_moguce_korake()
+                        
                         else:                                       #odselektovanje
                             self.tren=None
                             self.tabla.nacrtaj(self.proz)
@@ -86,35 +105,35 @@ class Igra:
                         self.nacrtaj_moguce_korake()
                 pygame.display.update()
     def nacrtaj_moguce_korake(self):
-        
+        self.moguca_polja = {}
         self.tren.ispisi_atribute(self.proz)
-        print("Izabrana fig crtanje:"+str(self.tren)+" na mjestu "+str(self.tren.indeks))
-        self.dobij_moguce_korake()
-        print("crtanje Moguci koraci:"+str(self.moguca_polja))
-        #iscrtati moguce korake
-        if self.lanac:              #za lancano prikazi samo polja koja pojedu nesto
-            for polje in self.moguca_polja:
-                #racunam koordinate sredine kruga
-                if self.moguca_polja[polje]!=0:
+        if self.tren.zaledjena==0:
+            print("Izabrana fig crtanje:"+str(self.tren)+" na mjestu "+str(self.tren.indeks))
+            self.dobij_moguce_korake()
+            print("crtanje Moguci koraci:"+str(self.moguca_polja))
+            #iscrtati moguce korake
+            if self.lanac:              #za lancano prikazi samo polja koja pojedu nesto
+                for polje in self.moguca_polja:
+                    #racunam koordinate sredine kruga
+                    if self.moguca_polja[polje]!=0:
+                        y=RAZMAK_VIS+KVADRAT*(polje//4)+KVADRAT//2
+                        if (polje//4)%2==0:
+                            x=RAZMAK_SIR+KVADRAT*((polje%4)*2)+KVADRAT//2
+                        else:
+                            x=RAZMAK_SIR+KVADRAT*((polje%4)*2+1)+KVADRAT//2
+                        pygame.draw.circle(self.proz,ZELENA,(x,y),10)
+
+            else:                       #prikazi sve mogucnosti kretanja
+                for polje in self.moguca_polja:
+                    #racunam koordinate sredine kruga
                     y=RAZMAK_VIS+KVADRAT*(polje//4)+KVADRAT//2
                     if (polje//4)%2==0:
                         x=RAZMAK_SIR+KVADRAT*((polje%4)*2)+KVADRAT//2
                     else:
                         x=RAZMAK_SIR+KVADRAT*((polje%4)*2+1)+KVADRAT//2
                     pygame.draw.circle(self.proz,ZELENA,(x,y),10)
-
-        else:                       #prikazi sve mogucnosti kretanja
-            for polje in self.moguca_polja:
-                #racunam koordinate sredine kruga
-                y=RAZMAK_VIS+KVADRAT*(polje//4)+KVADRAT//2
-                if (polje//4)%2==0:
-                    x=RAZMAK_SIR+KVADRAT*((polje%4)*2)+KVADRAT//2
-                else:
-                    x=RAZMAK_SIR+KVADRAT*((polje%4)*2+1)+KVADRAT//2
-                pygame.draw.circle(self.proz,ZELENA,(x,y),10)
     def dobij_moguce_korake(self):
         #U rijecniku cuva mjesto gdje ce stati: sta jede
-        self.moguca_polja = {}
         if not self.tren:
             print("Nije nista izabrano")
             return
@@ -166,6 +185,16 @@ class Igra:
         #self.tren=Figura
         if not self.biranje:
             self.zamjeni_na_redu()
+            for fig in self.tabla.polozaji:
+                if fig!=0: 
+                    if fig.boja==self.na_redu and fig.oklop_brojac>0: 
+                        #kada je neka boja na redu smanji njihove brojace
+                        print("\t smanjen brojac oklopa")
+                        fig.oklop_brojac-=1
+                    if fig.boja!=self.na_redu and fig.zaledjena>0:
+                        #kada je protivnik na redu smanji zaledjenost svojih figura
+                        print("\todledjavaj")
+                        fig.zaledjena-=1    
             if self.tren.topuz:
                 self.tren.topuz_brojac=1
             self.tren=None
@@ -201,14 +230,17 @@ class Igra:
                     boja_nove_fig=self.tabla.polozaji[polje].boja
                     self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
             else:
-                print("razlicita boja na indeksu "+str(polje))
-                if fig.topuz_brojac>0:
-                    print("\tima topuz ")
-                    #U rijecniku cuva mjesto gdje ce stati: sta jede
-                    self.moguca_polja[polje]=self.tabla.polozaji[polje]
-                
-                boja_nove_fig=self.tabla.polozaji[polje].boja
-                self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
+                if self.tabla.polozaji[polje].oklop_brojac>0:
+                    print("fig ima oklop na indeksu: "+str(fig.indeks))
+                else:    
+                    print("razlicita boja na indeksu "+str(polje))
+                    if fig.topuz_brojac>0:
+                        print("\tima topuz ")
+                        #U rijecniku cuva mjesto gdje ce stati: sta jede
+                        self.moguca_polja[polje]=self.tabla.polozaji[polje]
+                    
+                    boja_nove_fig=self.tabla.polozaji[polje].boja
+                    self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
         
     def moguce_polje_iza(self,fig,boja_nove_fig,polje,pravac):
         print("provjera polja iza")
@@ -345,7 +377,9 @@ class Igra:
         slike_moci={
                 1: TOPUZ_PLAVA,
                 2: KRALJ_PLAVA,
-                3: KONJ_PLAVI
+                3: KONJ_PLAVI,
+                4: STIT_PLAVA,
+                5: OCI_PLAVI
             }
         slika1=slike_moci.get(broj_moc1,None)
         slika2=slike_moci.get(broj_moc2,None)
@@ -403,8 +437,12 @@ class Igra:
                 elif moc==3:
                     print("\t3-sarac")
                     self.tren.postavi_sarca()
-                else:
-                    print("neka druga moc") 
+                elif moc==4:
+                    print("\t4-oklop")
+                    self.tren.postavi_oklop()
+                elif moc==5:
+                    print("\t4-pogled")
+                    self.tren.postavi_pogled()
                 #obrisi popup
                 self.tabla.nacrtaj(self.proz)
                 pygame.display.update()

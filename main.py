@@ -12,7 +12,7 @@ def main():
 
     igra.tabla.nacrtaj_kvadrate(PROZOR)
     igra.tabla.napravi_tablu(PROZOR)
-    #igra.tabla.test_tabla(PROZOR)
+    # igra.tabla.test_tabla(PROZOR)
     """ 
     fig=tabla.vrati_fig(1)
     tabla.pomjeri(fig, 15) """

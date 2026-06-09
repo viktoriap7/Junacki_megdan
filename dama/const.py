@@ -12,6 +12,11 @@ RAZMAK_VIS=(VIS_PROZORA-VIS_TABLE)//2
 
 ATRIBUTI_SIR=RAZMAK_SIR+VIS_TABLE+10
 ATRIBUTI_VIS=RAZMAK_VIS
+ATRIBUTI_STIT_VIS=600
+ATRIBUTI_OKO_VIS=550
+ATRIBUTI_DUGME_VIS=35
+ATRIBUTI_DUGME_SIR=200
+
 
 POPUP_SIR=400
 POPUP_VIS=200
@@ -46,7 +51,8 @@ MACE_HEAD_PLAVA_RAW = pygame.image.load("slike/mace_head_plava.png")
 MACE_HEAD_CRVENA_RAW = pygame.image.load("slike/mace_head_crvena.png")
 DONKEY_PLAVI_RAW = pygame.image.load("slike/donkey_plavi.png")
 DONKEY_CRVENI_RAW = pygame.image.load("slike/donkey_crveni.png")
-
+OCI_PLAVA_RAW = pygame.image.load("slike/oci_plave.png")
+OCI_CRVENA_RAW = pygame.image.load("slike/oci_crvene.png")
 #KONAČNE SLIKE
 MARKO_PLAVI = pygame.transform.scale(MARKO_PLAVI_RAW, (SLIKA, SLIKA))
 MARKO_CRVENI = pygame.transform.scale(MARKO_CRVENI_RAW, (SLIKA, SLIKA))
@@ -58,3 +64,5 @@ TOPUZ_PLAVA = pygame.transform.scale(MACE_HEAD_PLAVA_RAW, (SLIKA, SLIKA))
 TOPUZ_CRVENA = pygame.transform.scale(MACE_HEAD_CRVENA_RAW, (SLIKA, SLIKA))
 KONJ_PLAVI = pygame.transform.scale(DONKEY_PLAVI_RAW, (SLIKA, SLIKA))
 KONJ_CRVENI = pygame.transform.scale(DONKEY_CRVENI_RAW, (SLIKA, SLIKA))
+OCI_PLAVI = pygame.transform.scale(OCI_PLAVA_RAW, (SLIKA, SLIKA))
+OCI_CRVENI = pygame.transform.scale(OCI_CRVENA_RAW, (SLIKA, SLIKA))
