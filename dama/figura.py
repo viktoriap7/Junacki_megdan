@@ -32,8 +32,10 @@ class Figura:
             self.oklop_brojac=1
     def postavi_sarca(self):
         self.sarac=True
+        self.postavi_marka()
     def postavi_marka(self):
-        self.marko=True
+        if self.kralj and self.sarac and self.obrve and self.topuz:
+            self.marko=True
     def krunisi(self):
         print("--- DETEKTIVSKI ISPIS ---")
         print("Funkcija krunisi() je UPRAVO POKRENUTA za indeks: " + str(self.indeks))
@@ -43,10 +45,12 @@ class Figura:
     def postavi_topuz(self):
         self.topuz=True
         self.topuz_brojac=1
+        self.postavi_marka()
     def postavi_topuz_br(self):
         self.topuz_brojac=1
     def postavi_pogled(self):
         self.obrve=True
+        self.postavi_marka()
     def __str__(self):
         boja=""
         if self.boja==CRVENA:
@@ -165,4 +169,16 @@ class Figura:
     def pomjeri_fig(self,indeks):
         self.indeks=indeks
         self.rac_pozicija()
+    def dodjeli_moc(self, moc):
+                if moc==1:
+                    self.postavi_topuz()
+                elif moc==2:
+                    self.krunisi()
+                elif moc==3:
+                    self.postavi_sarca()
+                elif moc==4:
+                    self.postavi_oklop()
+                elif moc==5:
+                    self.postavi_pogled()
+                
     

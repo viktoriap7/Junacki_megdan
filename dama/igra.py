@@ -8,6 +8,7 @@ class Igra:
         self.tren=None
         self.tabla=Tabla()
         self.na_redu=PLAVA
+        #rijecnik kljuc:indeks na koji fig staje, vrijednost:fig koju jede
         self.moguca_polja={}
         self.proz=proz
 
@@ -132,6 +133,12 @@ class Igra:
                     else:
                         x=RAZMAK_SIR+KVADRAT*((polje%4)*2+1)+KVADRAT//2
                     pygame.draw.circle(self.proz,ZELENA,(x,y),10)
+    def dobij_korake_koji_jedu(self):
+        jedu=[]
+        for polje in self.moguca_polja:
+            if self.moguca_polja[polje]!=0:
+                jedu.append((self.tren.indeks,polje,self.moguca_polja[polje]))
+        return jedu
     def dobij_moguce_korake(self):
         #U rijecniku cuva mjesto gdje ce stati: sta jede
         if not self.tren:
