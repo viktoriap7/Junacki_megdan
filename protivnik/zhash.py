@@ -29,7 +29,7 @@ class Zobrist_hash:
         tren_hash=0
         
         for indeks,fig in enumerate(polozaji):
-            
+            vrednost_fig=1
             if fig!=0:
                 if fig.boja==PLAVA:
                     vrednost_fig=1
@@ -37,19 +37,19 @@ class Zobrist_hash:
                     vrednost_fig=3
                 if fig.kralj:
                     vrednost_fig+=1
-            tren_hash^=self.tabla_kretanja_figura[indeks][vrednost_fig]
-            if fig.topuz:
-                tren_hash^=self.tabla_topuza[indeks]
-            if fig.sarac:
-                tren_hash^=self.tabla_sarca[indeks]
-            if fig.oklop:
-                tren_hash^=self.tabla_oklopa[indeks]
-            if fig.oklop_brojac>0:
-                tren_hash^=self.tabla_koristi_oklop[indeks]
-            if fig.obrve:
-                tren_hash^=self.tabla_pogleda[indeks]
-            if fig.zaledjena:
-                tren_hash^=self.tabla_zaledjena[indeks]
+                tren_hash^=self.tabla_kretanja_figura[indeks][vrednost_fig]
+                if fig.topuz:
+                    tren_hash^=self.tabla_topuza[indeks]
+                if fig.sarac:
+                    tren_hash^=self.tabla_sarca[indeks]
+                if fig.oklop:
+                    tren_hash^=self.tabla_oklopa[indeks]
+                if fig.oklop_brojac>0:
+                    tren_hash^=self.tabla_koristi_oklop[indeks]
+                if fig.obrve:
+                    tren_hash^=self.tabla_pogleda[indeks]
+                if fig.zaledjena:
+                    tren_hash^=self.tabla_zaledjena[indeks]
         if na_redu==CRVENA:
             tren_hash^=self.na_redu_protivnik
         return tren_hash

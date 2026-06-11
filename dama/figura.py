@@ -37,11 +37,8 @@ class Figura:
         if self.kralj and self.sarac and self.obrve and self.topuz:
             self.marko=True
     def krunisi(self):
-        print("--- DETEKTIVSKI ISPIS ---")
-        print("Funkcija krunisi() je UPRAVO POKRENUTA za indeks: " + str(self.indeks))
-        print("Pre krunisanja, self.kralj je: " + str(self.kralj))
-        print("Pre krunisanja, self.marko je: " + str(self.marko))
         self.kralj=True
+        self.postavi_marka()
     def postavi_topuz(self):
         self.topuz=True
         self.topuz_brojac=1
