@@ -20,7 +20,7 @@ class Racun:
         for fig in polozaji:
             if fig!=0:
                 zbir=0
-                if 0<fig.indeks%4<3:
+                if 0<fig.indeks//4<3:
                     zbir+=10
                 if fig.marko:
                     zbir+=20
@@ -69,10 +69,11 @@ class Racun:
                         svi_potezi.append((indeks,novi_indeks,jede_indeks))
         return svi_potezi
 
-    def pomjeri(self,stari_polozaji,potez):
+    def pomjeri(self,stari_polozaji,potez,dek):
         """ vraca novu tablu na kojoj je izvrsen ovaj pokret 
         i da li je pojedeno nesto """
         polozaji=deepcopy(stari_polozaji)
+        dek_moci=deepcopy(dek)
         pojeo=False
         tren=None
         stari_indeks,novi_indeks,index_jede_fig=potez
@@ -86,11 +87,14 @@ class Racun:
         polozaji[novi_indeks]=fig 
         polozaji[stari_indeks]=0
         fig.indeks=novi_indeks
+        if novi_indeks in self.igra.tabla.oranje:
+            moc=dek_moci.ukloni_prvi()
+            fig.dodjeli_moc(moc)
         if pojeo:
             tren=novi_indeks
-        return polozaji,tren
+        return polozaji,tren,dek
 
-    def minmax(self,polozaji,tren,dubina,alfa,beta,na_redu):
+    def minmax(self,polozaji,tren,dubina,alfa,beta,na_redu,dek):
         vrijeme=time.time()-self.poc_vrijeme
         print("vrijeme: "+str(vrijeme))
         if vrijeme>self.duzina_razmisljanja:
@@ -108,10 +112,10 @@ class Racun:
                 return self.heuristika_izracunaj(polozaji)
             for potez in svi_potezi:
                 sledeci_na_redu=CRVENA
-                novi_polozaji,novi_tren=self.pomjeri(polozaji,potez)
+                novi_polozaji,novi_tren,novi_dek=self.pomjeri(polozaji,potez,dek)
                 if novi_tren==None:
                     sledeci_na_redu=PLAVA
-                ocjena=self.minmax(novi_polozaji,novi_tren,dubina-1,alfa,beta,sledeci_na_redu)
+                ocjena=self.minmax(novi_polozaji,novi_tren,dubina-1,alfa,beta,sledeci_na_redu,novi_dek)
                 max_ocjena=max(ocjena,max_ocjena)
                 alfa = max(alfa, max_ocjena)
                 if beta <= alfa:
@@ -126,10 +130,10 @@ class Racun:
                 return self.heuristika_izracunaj(polozaji)
             for potez in svi_potezi:
                 sledeci_na_redu=PLAVA
-                novi_polozaji,novi_tren=self.pomjeri(polozaji,potez)
+                novi_polozaji,novi_tren,novi_dek=self.pomjeri(polozaji,potez,dek)
                 if novi_tren==None:
                     sledeci_na_redu=CRVENA
-                ocjena=self.minmax(novi_polozaji,novi_tren,dubina-1,alfa,beta,sledeci_na_redu)
+                ocjena=self.minmax(novi_polozaji,novi_tren,dubina-1,alfa,beta,sledeci_na_redu,novi_dek)
                 min_ocjena=min(ocjena,min_ocjena)
                 beta = min(beta, min_ocjena)
                 if beta <= alfa:
@@ -151,10 +155,10 @@ class Racun:
                 break
             for potez in svi_potezi:
                 sledeci_na_redu=CRVENA
-                novi_polozaji,novi_tren=self.pomjeri(self.igra.tabla.polozaji,potez)
+                novi_polozaji,novi_tren,novi_dek=self.pomjeri(self.igra.tabla.polozaji,potez,self.igra.dek_moci)
                 if novi_tren==None:
                     sledeci_na_redu=PLAVA
-                ocjena = self.minmax(novi_polozaji, novi_tren, dubina, float('-inf'), float('inf'), sledeci_na_redu)
+                ocjena = self.minmax(novi_polozaji, novi_tren, dubina, float('-inf'), float('inf'), sledeci_na_redu,novi_dek)
                 print("ocjena: "+str(ocjena)+" za potez "+str(potez))
                 if ocjena>max_ocjena:
                     max_ocjena=ocjena
@@ -177,4 +181,21 @@ class Racun:
             self.igra.tren.dodjeli_moc(moc)
             self.igra.biranje=False
             self.igra.upravljaj_redom()
+
+    def ispitaj_trajanje(self):
+        """ vraca ko pobjedjuje, none igra se nastavlja, za remi vrati crnu boju """
+        
+        if self.igra.tabla.bijele_fig==0:
+            return CRVENA
+        if self.igra.tabla.crne_fig==0:
+            return PLAVA
+        svi_potezi=self.dobij_sve_poteze(self.igra.tabla.polozaji,self.igra.na_redu,None)
+        if svi_potezi==[]:
+            if self.igra.na_redu==PLAVA:
+                return CRVENA
+            else:
+                return PLAVA
+        if self.igra.broj_poteza>40:
+            return CRNA
+        return None
 

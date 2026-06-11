@@ -11,14 +11,14 @@ class Igra:
         #rijecnik kljuc:indeks na koji fig staje, vrijednost:fig koju jede
         self.moguca_polja={}
         self.proz=proz
-
+        self.broj_poteza=0
         self.lanac=False
         self.biranje=False
         self.dek_moci=Dek()
     def update(self):
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
-
+        
     def zamjeni_na_redu(self):
         if self.na_redu==CRVENA:
             self.na_redu=PLAVA
@@ -53,6 +53,7 @@ class Igra:
             izabrano=self.dobij_stranu_moci_od_misa(poz)
             self.dodjeli_moc(izabrano)
             self.upravljaj_redom()
+            self.broj_poteza=0
         else:
             if self.tren:
                     if self.lanac:
@@ -176,13 +177,16 @@ class Igra:
         
         pojeo=self.tabla.pojedi_fig(fig_za_jedednje,self.tren.boja)
         self.tabla.pomjeri(self.tren,indeks) #pomjera figure mjenjanjem indeksa
+        self.broj_poteza+=1
         self.tabla.nacrtaj(self.proz)
         if self.tren.indeks in self.tabla.oranje:
             self.biranje=True
+            self.broj_poteza=0
         self.tabla.nacrtaj(self.proz)
         pygame.display.update()
         if pojeo:                           #ako igrac pojede nesto,ispitaj da li moze lancano
             self.lanac=True
+            self.broj_poteza=0
             self.nacrtaj_moguce_korake()
             if any(v != 0 for v in self.moguca_polja.values()):
                 print("Postoji figura koja se moze pojest")
