@@ -3,7 +3,7 @@ from copy import deepcopy
 from protivnik.zhash import Zobrist_hash
 from dama.figura import Figura
 from dama.const import *
-from dama.igra import Igra
+from dama.igra import Igra,promadji_najblizu
 from dama.strukture import Dek
 class Racun:
     def __init__(self,igra):
@@ -19,7 +19,7 @@ class Racun:
         ocjena=0
         for fig in polozaji:
             if fig!=0:
-                zbir=0
+                zbir=50
                 if 0<fig.indeks//4<3:
                     zbir+=10
                 if fig.marko:
@@ -33,11 +33,11 @@ class Racun:
                 if fig.oklop:
                     zbir+=10
                 if fig.oklop_brojac>0:
-                    zbir+=20
+                    zbir+=1000
                 if fig.obrve:
                     zbir+=20
                 if fig.zaledjena:
-                    zbir-=20
+                    zbir-=1000
 
                 if fig.boja==CRVENA:
                     ocjena+=zbir
@@ -45,18 +45,18 @@ class Racun:
                     ocjena-=zbir
         return ocjena
     def dobij_sve_poteze(self,polozaji,na_redu,tren):
-        """ format poteza(pocetni indeks fig, krajnji indeks fig, indeks pojedene fig)
+        """ format poteza(pocetni indeks fig, krajnji indeks fig, indeks pojedene fig,moc)
          ako nista nije pojedeno vraca None,
           upisuje sve korake u moguci_potezi igre """
         #tren je ako je izabrana figura koja se mora kretati
         simulacija=Igra(None)
-        simulacija.tabla.polozaji=polozaji
-        simulacija.na_redu=na_redu
+        simulacija.tabla.polozaji=deepcopy(polozaji)
+        simulacija.na_redu=deepcopy(na_redu)
         svi_potezi=[]
-        if tren:
+        if tren:    #dio za lanac
             simulacija.tren=polozaji[tren]
             svi_potezi=simulacija.dobij_korake_koji_jedu()
-        else:
+        else:       #dio za obican potez
             for indeks,fig in enumerate(polozaji):
                 if fig !=0 and fig.boja==na_redu:
                     simulacija.tren=fig
@@ -66,7 +66,11 @@ class Racun:
                             jede_indeks=None
                         else:
                             jede_indeks=jede_fig.indeks
-                        svi_potezi.append((indeks,novi_indeks,jede_indeks))
+                        svi_potezi.append((indeks,novi_indeks,jede_indeks,None))
+                    if fig.obrve==True:
+                        svi_potezi.append((indeks,indeks,None,5))
+                    if fig.oklop==True:
+                        svi_potezi.append((indeks,indeks,None,4))
         return svi_potezi
 
     def pomjeri(self,stari_polozaji,potez,dek):
@@ -76,22 +80,28 @@ class Racun:
         dek_moci=deepcopy(dek)
         pojeo=False
         tren=None
-        stari_indeks,novi_indeks,index_jede_fig=potez
+        stari_indeks,novi_indeks,index_jede_fig,moc=potez
         fig=polozaji[stari_indeks]
-        if index_jede_fig:
-            if fig.topuz_brojac > 0:
-                fig.topuz_brojac -= 1
-            polozaji[index_jede_fig]=0
-            pojeo=True
+        if moc:
+            if moc==4:
+                fig.upotrebi_oklop()
+            elif moc==5:
+                promadji_najblizu(fig,polozaji)
+        else:    
+            if index_jede_fig:
+                if fig.topuz_brojac > 0:
+                    fig.topuz_brojac -= 1
+                polozaji[index_jede_fig]=0
+                pojeo=True
 
-        polozaji[novi_indeks]=fig 
-        polozaji[stari_indeks]=0
-        fig.indeks=novi_indeks
-        if novi_indeks in self.igra.tabla.oranje:
-            moc=dek_moci.ukloni_prvi()
-            fig.dodjeli_moc(moc)
-        if pojeo:
-            tren=novi_indeks
+            polozaji[novi_indeks]=fig 
+            polozaji[stari_indeks]=0
+            fig.indeks=novi_indeks
+            if novi_indeks in self.igra.tabla.oranje:
+                moc=dek_moci.ukloni_prvi()
+                fig.dodjeli_moc(moc)
+            if pojeo:
+                tren=novi_indeks
         return polozaji,tren,dek
 
     def minmax(self,polozaji,tren,dubina,alfa,beta,na_redu,dek):
@@ -171,16 +181,25 @@ class Racun:
     def igraj(self):
         print("bira racunar")
         #self.igra=Igra()
-        stari_indeks,novi_indeks,tren=self.pronadji_najbolji_potez()
+        stari_indeks,novi_indeks,tren,moc=self.pronadji_najbolji_potez()
         self.igra.tren=self.igra.tabla.polozaji[stari_indeks]
-        self.igra.dobij_moguce_korake()
-        print("nasao potez")
-        self.igra.pokusaj_pomjeriti(novi_indeks)
-        if self.igra.biranje:
-            moc=self.igra.dek_moci.ukloni_prvi()
-            self.igra.tren.dodjeli_moc(moc)
-            self.igra.biranje=False
+        if moc:
+            if moc==4:
+                self.igra.tren.upotrebi_oklop()
+                print("odigrao oklop")
+            elif moc==5:
+                promadji_najblizu(self.igra.tren,self.igra.tabla.polozaji)
+                print("odigrao pogled")
             self.igra.upravljaj_redom()
+        else:    
+            self.igra.dobij_moguce_korake()
+            print("nasao potez")
+            self.igra.pokusaj_pomjeriti(novi_indeks)
+            if self.igra.biranje:
+                moc=self.igra.dek_moci.ukloni_prvi()
+                self.igra.tren.dodjeli_moc(moc)
+                self.igra.biranje=False
+                self.igra.upravljaj_redom()
 
     def ispitaj_trajanje(self):
         """ vraca ko pobjedjuje, none igra se nastavlja, za remi vrati crnu boju """

@@ -21,8 +21,9 @@ def main():
     tabla.pomjeri(fig, 15) """
     pygame.display.update()
     traje=None
+    ceka_kraj = True
     while run:
-        clock.tick(60)
+        clock.tick(300)
         if igra.na_redu==CRVENA:
             rac.igraj()
             pygame.display.update()
@@ -31,6 +32,7 @@ def main():
         for dogadjaj in pygame.event.get():
             if dogadjaj.type==pygame.QUIT:
                 run= False
+                ceka_kraj=False
 
             if dogadjaj.type==pygame.MOUSEBUTTONDOWN and igra.na_redu==PLAVA:
                 poz=pygame.mouse.get_pos()
@@ -62,7 +64,7 @@ def main():
     tekst_POPUP_RAZMAK_VIS=POPUP_RAZMAK_VIS+(POPUP_VIS/2)-15  # Pomjereno malo gore da ne udara u slike
     PROZOR.blit(tekst_povrsina,(tekst_POPUP_RAZMAK_SIR,tekst_POPUP_RAZMAK_VIS))
     pygame.display.update()
-    ceka_kraj = True
+    
     while ceka_kraj:
         for dogadjaj in pygame.event.get():
             if dogadjaj.type == pygame.QUIT:

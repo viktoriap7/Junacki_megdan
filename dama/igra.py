@@ -74,7 +74,7 @@ class Igra:
                             pygame.display.update()
                             return
                         if indeks==-3:
-                            self.tabla.promadji_najblizu(self.tren)
+                            promadji_najblizu(self.tren,self.tabla.polozaji)
                             self.upravljaj_redom()
                             self.tabla.nacrtaj(self.proz)
                             pygame.display.update()
@@ -101,7 +101,7 @@ class Igra:
                 print("nema nista izabrano")
                 indeks=self.dobij_indeks_od_misa(poz)
                 if indeks!=-1 and self.tabla.polozaji[indeks]!=0:
-                    if self.tabla.polozaji[indeks].boja==self.na_redu:
+                    if self.tabla.polozaji[indeks].boja==self.na_redu and self.tabla.polozaji[indeks].zaledjena==0:
                         self.tren=self.tabla.polozaji[indeks]
                         print("izabran "+str(self.tren)+" "+str(self.tren.indeks))
                         self.nacrtaj_moguce_korake()
@@ -138,7 +138,7 @@ class Igra:
         self.dobij_moguce_korake()
         for polje in self.moguca_polja:
             if self.moguca_polja[polje]!=0:
-                jedu.append((self.tren.indeks,polje,self.moguca_polja[polje].indeks))
+                jedu.append((self.tren.indeks,polje,self.moguca_polja[polje].indeks,None))
         return jedu
     def dobij_moguce_korake(self):
         self.moguca_polja = {}
@@ -154,8 +154,9 @@ class Igra:
         #obicne fig
         if not self.tren.kralj:
             self.provjeri_dijagonale(self.tren,i,osnovni_pravac)
-        else:
+        elif self.tren.zaledjena==0:
         #vise polja i drugi pravac za kralja
+            
             obrnuti_pravac=osnovni_pravac*-1
             self.provjeri_dijagonale_kralja(self.tren,i,osnovni_pravac)
             self.provjeri_dijagonale_kralja(self.tren,i,obrnuti_pravac)
@@ -163,8 +164,8 @@ class Igra:
                 print("Kralj ima relikviju (Šarac/Topuz) - računam posebne korake...")
                 self.provjeri_dijagonale(self.tren, i, osnovni_pravac)
                 self.provjeri_dijagonale(self.tren, i, obrnuti_pravac)
-        print("\t tren:"+str(self.tren.indeks))
-        print("moguca polja: "+str(self.moguca_polja))
+        #print("\t tren:"+str(self.tren.indeks))
+        #print("moguca polja: "+str(self.moguca_polja))
     def pokusaj_pomjeriti(self,indeks):
         print("korak na "+str(indeks))
         #self.pokusaj_pomjeriti(indeks)
@@ -245,9 +246,10 @@ class Igra:
                     self.moguce_polje_iza(fig,boja_nove_fig,polje,pravac)
             else:
                 if self.tabla.polozaji[polje].oklop_brojac>0:
-                    print("fig ima oklop na indeksu: "+str(fig.indeks))
+                    pass
+                    #print("fig ima oklop na indeksu: "+str(fig.indeks))
                 else:    
-                    print("razlicita boja na indeksu "+str(polje))
+                    #print("razlicita boja na indeksu "+str(polje))
                     if fig.topuz_brojac>0:
                         print("\tima topuz ")
                         #U rijecniku cuva mjesto gdje ce stati: sta jede
@@ -460,3 +462,19 @@ class Igra:
                 #obrisi popup
                 self.tabla.nacrtaj(self.proz)
                 pygame.display.update()
+def promadji_najblizu(tren,polozaji):
+    najbliza_fig=None
+    najmanja_dist=float('inf')
+    for fig in polozaji:
+        if fig!=0 and fig.boja!=tren.boja:
+            x,y=fig.x,fig.y
+            dist=((x-tren.x)**2)+((y-tren.y)**2)
+
+            if dist<najmanja_dist:
+                najmanja_dist=dist
+                najbliza_fig=fig
+    if najbliza_fig:
+        najbliza_fig.zaledjena=2
+        tren.oko=False
+        print("Zamznuta fig na indeksu:"+str(najbliza_fig.indeks))
+            

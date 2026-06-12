@@ -107,19 +107,4 @@ class Tabla:
                 self.polozaji[fig.indeks]=0
                 return True
         return False
-    def promadji_najblizu(self,tren):
-        najbliza_fig=None
-        najmanja_dist=float('inf')
-        for fig in self.polozaji:
-            if fig!=0 and fig.boja!=tren.boja:
-                x,y=fig.x,fig.y
-                dist=((x-tren.x)**2)+((y-tren.y)**2)
-
-                if dist<najmanja_dist:
-                    najmanja_dist=dist
-                    najbliza_fig=fig
-        if najbliza_fig:
-            najbliza_fig.zaledjena=2
-            tren.oko=False
-            print("Zamznuta fig na indeksu:"+str(najbliza_fig.indeks))
-            
+    
