@@ -1,3 +1,4 @@
+from copy import deepcopy
 import pygame
 from dama.const import *
 from dama.tabla import Tabla
@@ -15,6 +16,26 @@ class Igra:
         self.lanac=False
         self.biranje=False
         self.dek_moci=Dek()
+    def __deepcopy__(self, memo):
+        # Kreiramo novu instancu klase bez pozivanja __init__-a
+        nova_igra = self.__class__.__new__(self.__class__)
+        
+        # Obavezno ažuriraj memo rječnik kako bi izbjegla beskonačnu rekurziju
+        memo[id(self)] = nova_igra
+        
+        # 1. REFERENCA (ne kopiramo ga, samo prenosimo vezu)
+        nova_igra.proz = self.proz  
+        
+        nova_igra.tren = deepcopy(self.tren, memo)
+        nova_igra.tabla = deepcopy(self.tabla, memo)
+        nova_igra.moguca_polja = deepcopy(self.moguca_polja, memo)
+        nova_igra.dek_moci = deepcopy(self.dek_moci, memo)
+        nova_igra.na_redu = self.na_redu
+        nova_igra.broj_poteza = self.broj_poteza
+        nova_igra.lanac = self.lanac
+        nova_igra.biranje = self.biranje
+        
+        return nova_igra
     def update(self):
         self.tabla.nacrtaj(self.proz)
         boja_teksta = BIJELA if self.na_redu == PLAVA else CRVENA
@@ -59,6 +80,7 @@ class Igra:
             self.dodjeli_moc(izabrano)
             self.upravljaj_redom()
             self.broj_poteza=0
+            return True
         else:
             if self.tren:
                     if self.lanac:
@@ -77,17 +99,18 @@ class Igra:
                             self.upravljaj_redom()
                             self.tabla.nacrtaj(self.proz)
                             pygame.display.update()
-                            return
+                            return True
                         if indeks==-3:
                             promadji_najblizu(self.tren,self.tabla.polozaji)
                             self.upravljaj_redom()
                             self.tabla.nacrtaj(self.proz)
                             pygame.display.update()
-                            return
+                            return True
                         elif indeks in self.moguca_polja:           #pomjeranje fig
                             self.pokusaj_pomjeriti(indeks)
                             if self.biranje:                
                                 self.nacrtaj_biranje_moci()
+                            return True
                         elif indeks!=-1 and self.tabla.polozaji[indeks]!=0:   #selektovanje druge fig
                             if self.tabla.polozaji[indeks].boja==self.tren.boja:
                                 print("promjena odabranog")
@@ -102,6 +125,7 @@ class Igra:
                             self.tabla.nacrtaj(self.proz)
                             pygame.display.update()
                         print("Tren: "+str(self.tren)+" na redu:"+str(self.na_redu))
+                        return False
             else:
                 print("nema nista izabrano")
                 indeks=self.dobij_indeks_od_misa(poz)
@@ -111,6 +135,7 @@ class Igra:
                         print("izabran "+str(self.tren)+" "+str(self.tren.indeks))
                         self.nacrtaj_moguce_korake()
                 pygame.display.update()
+                return False
     def nacrtaj_moguce_korake(self):
         self.tren.ispisi_atribute(self.proz)
         if self.tren.zaledjena==0:

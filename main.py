@@ -1,9 +1,11 @@
 import pygame
+from copy import deepcopy
 from dama.const import *
 from dama.tabla import Tabla
 from dama.igra import Igra
 from protivnik.zhash import Zobrist_hash
 from protivnik.rac import Racun
+from dama.strukture import Stek
 PROZOR=pygame.display.set_mode((SIR_PROZORA,VIS_PROZORA))
 pygame.display.set_caption('Junački megdan')
 
@@ -12,9 +14,13 @@ def main():
     igra=Igra(PROZOR) 
     """ nisi dodala sat!!! """
     rac=Racun(igra)
+    potezi_plavog=Stek()
     igra.tabla.nacrtaj_kvadrate(PROZOR)
     igra.tabla.napravi_tablu(PROZOR)
     clock = pygame.time.Clock()
+
+    potez=deepcopy(igra)
+    potezi_plavog.push(potez)
     # igra.tabla.test_tabla(PROZOR)
     """ 
     fig=tabla.vrati_fig(1)
@@ -27,16 +33,41 @@ def main():
         if igra.na_redu==CRVENA:
             rac.igraj()
             pygame.display.update()
+    
+            potez=deepcopy(igra)
+            potezi_plavog.push(potez)
             
 
         for dogadjaj in pygame.event.get():
             if dogadjaj.type==pygame.QUIT:
                 run= False
                 ceka_kraj=False
-
             if dogadjaj.type==pygame.MOUSEBUTTONDOWN and igra.na_redu==PLAVA:
+
                 poz=pygame.mouse.get_pos()
-                igra.odabir_misem(poz)
+                x,y=poz
+                if 10<x<10+ATRIBUTI_DUGME_SIR and ATRIBUTI_STIT_VIS<y<ATRIBUTI_STIT_VIS+ATRIBUTI_VIS:
+                    print("UNDO")
+                    igra=potezi_plavog.pop()
+                    if igra!=-1:
+                        print("obicno")
+                        igra.tabla.nacrtaj(PROZOR)
+                        pygame.display.update()
+                        rac.igra=igra
+                                            
+                    else:
+                        print("minus 1")
+                        igra=Igra(PROZOR)
+                        
+                        igra.tabla.napravi_tablu(PROZOR)
+                        igra.tabla.nacrtaj(PROZOR)
+                        igra.tabla.prikazi_tablu()
+                        rac.igra=igra
+                        potez=deepcopy(igra)
+                        potezi_plavog.push(potez)
+                    
+                else:
+                    rez=igra.odabir_misem(poz)
                 print("main")
         traje=rac.ispitaj_trajanje()
         if traje:

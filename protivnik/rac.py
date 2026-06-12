@@ -33,11 +33,11 @@ class Racun:
                 if fig.oklop:
                     zbir+=10
                 if fig.oklop_brojac>0:
-                    zbir+=1000
+                    zbir+=10
                 if fig.obrve:
                     zbir+=20
                 if fig.zaledjena:
-                    zbir-=1000
+                    zbir-=10
 
                 if fig.boja==CRVENA:
                     ocjena+=zbir

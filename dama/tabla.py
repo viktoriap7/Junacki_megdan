@@ -76,6 +76,10 @@ class Tabla:
     def nacrtaj(self,proz):
         self.nacrtaj_kvadrate(proz)
         self.nacrtaj_figure(proz)
+        pygame.draw.rect(proz,CRNA,pygame.Rect(10,ATRIBUTI_STIT_VIS,ATRIBUTI_DUGME_SIR,ATRIBUTI_DUGME_VIS),2)
+        text=FONT.render("Undo",True,BIJELA)
+        proz.blit(text,(10+(ATRIBUTI_DUGME_SIR-text.get_width())//2,ATRIBUTI_STIT_VIS+(ATRIBUTI_DUGME_VIS-text.get_height())//2))
+                
         self.prikazi_tablu()
     def pomjeri(self,fig,indeks):
         #ZAMJENI INDEKSE FIGURE I INDEKS MJESTA NA OKJE FIG STAJE
