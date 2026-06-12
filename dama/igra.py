@@ -17,6 +17,11 @@ class Igra:
         self.dek_moci=Dek()
     def update(self):
         self.tabla.nacrtaj(self.proz)
+        boja_teksta = BIJELA if self.na_redu == PLAVA else CRVENA
+        ime_igraca = "PLAVI" if self.na_redu == PLAVA else "CRVENI"
+        
+        tekst_povrsina = FONT.render(f"Na redu: {ime_igraca}", True, boja_teksta)
+        self.proz.blit(tekst_povrsina, (10, 10))
         pygame.display.update()
         
     def zamjeni_na_redu(self):
@@ -214,6 +219,7 @@ class Igra:
                 self.tren.topuz_brojac=1
             self.tren=None
             self.lanac=False
+            self.update()
     def provjeri_dijagonale(self, fig, i, pravac):
         """Pomocna funkcija koja provjerava dijagonale za zadati pravac kretanja"""
         if (i//4)%2==0:  # PARNI RED
