@@ -80,7 +80,7 @@ class Igra:
             self.dodjeli_moc(izabrano)
             self.upravljaj_redom()
             self.broj_poteza=0
-            return True
+            return False
         else:
             if self.tren:
                     if self.lanac:

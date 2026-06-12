@@ -5,7 +5,7 @@ from dama.tabla import Tabla
 from dama.igra import Igra
 from protivnik.zhash import Zobrist_hash
 from protivnik.rac import Racun
-from dama.strukture import Stek
+from dama.strukture import Stek,Stablo,Cvor
 PROZOR=pygame.display.set_mode((SIR_PROZORA,VIS_PROZORA))
 pygame.display.set_caption('Junački megdan')
 
@@ -18,7 +18,9 @@ def main():
     igra.tabla.nacrtaj_kvadrate(PROZOR)
     igra.tabla.napravi_tablu(PROZOR)
     clock = pygame.time.Clock()
-
+    cvor=Cvor(deepcopy(igra.tabla))
+    stablo=Stablo(cvor)
+    stablo.tren_cvor=cvor
     potez=deepcopy(igra)
     potezi_plavog.push(potez)
     # igra.tabla.test_tabla(PROZOR)
@@ -27,7 +29,7 @@ def main():
     tabla.pomjeri(fig, 15) """
     pygame.display.update()
     traje=None
-    ceka_kraj = True
+    prikaz_igre = True
     while run:
         clock.tick(300)
         if igra.na_redu==CRVENA:
@@ -36,17 +38,22 @@ def main():
     
             potez=deepcopy(igra)
             potezi_plavog.push(potez)
+            cvor=Cvor(deepcopy(igra.tabla))
+            stablo.tren_cvor.dodaj_dijete(cvor)
+            stablo.tren_cvor=cvor
+
             
 
         for dogadjaj in pygame.event.get():
             if dogadjaj.type==pygame.QUIT:
                 run= False
-                ceka_kraj=False
             if dogadjaj.type==pygame.MOUSEBUTTONDOWN and igra.na_redu==PLAVA:
 
                 poz=pygame.mouse.get_pos()
                 x,y=poz
                 if 10<x<10+ATRIBUTI_DUGME_SIR and ATRIBUTI_STIT_VIS<y<ATRIBUTI_STIT_VIS+ATRIBUTI_VIS:
+                    if stablo.tren_cvor.roditelj!=None:
+                        stablo.tren_cvor=stablo.tren_cvor.roditelj
                     print("UNDO")
                     igra=potezi_plavog.pop()
                     if igra!=-1:
@@ -54,7 +61,7 @@ def main():
                         igra.tabla.nacrtaj(PROZOR)
                         pygame.display.update()
                         rac.igra=igra
-                                            
+                 
                     else:
                         print("minus 1")
                         igra=Igra(PROZOR)
@@ -68,6 +75,10 @@ def main():
                     
                 else:
                     rez=igra.odabir_misem(poz)
+                    if rez:
+                        cvor=Cvor(deepcopy(igra.tabla))
+                        stablo.tren_cvor.dodaj_dijete(cvor)
+                        stablo.tren_cvor=cvor
                 print("main")
         traje=rac.ispitaj_trajanje()
         if traje:
@@ -80,26 +91,23 @@ def main():
     else:
         text="POBJEDNIK: PLAVI IGRAC"
     popup_pravougaonik=pygame.Rect(POPUP_RAZMAK_SIR,POPUP_RAZMAK_VIS,POPUP_SIR,POPUP_VIS)
-    
-    # 4. Crta se unutrašnjost (SIVA pozadina)
     pygame.draw.rect(PROZOR,SIVA,popup_pravougaonik)
-    
-    # 5. Crta se ivica (CRNA boja, debljina ivice 4 piksela)
     pygame.draw.rect(PROZOR,CRNA,popup_pravougaonik,4)
     
-    # 6. Renderujemo tekst koristeći tvoj FONT i BIJELA slova
     tekst_povrsina=FONT.render(text,True,BIJELA)
     
-    # 7. Računamo poziciju teksta tako da bude tačno u centru našeg popup-a
     tekst_POPUP_RAZMAK_SIR=POPUP_RAZMAK_SIR+(POPUP_SIR-tekst_povrsina.get_width())//2
     tekst_POPUP_RAZMAK_VIS=POPUP_RAZMAK_VIS+(POPUP_VIS/2)-15  # Pomjereno malo gore da ne udara u slike
     PROZOR.blit(tekst_povrsina,(tekst_POPUP_RAZMAK_SIR,tekst_POPUP_RAZMAK_VIS))
     pygame.display.update()
     
-    while ceka_kraj:
+    while prikaz_igre:
+
         for dogadjaj in pygame.event.get():
-            if dogadjaj.type == pygame.QUIT:
-                ceka_kraj = False
+            if dogadjaj.type==pygame.QUIT:
+                prikaz_igre = False
+            if dogadjaj.type==pygame.MOUSEBUTTONDOWN:
+                stablo.preorder(stablo.korijen,PROZOR)
     pygame.quit()
 main()
 

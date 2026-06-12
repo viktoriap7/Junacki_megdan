@@ -1,5 +1,5 @@
 import random
-
+import pygame
 class Stek:
     def __init__(self):
         self.pod=[]
@@ -64,14 +64,31 @@ class Cvor:
     def dodaj_dijete(self,dijete):
         dijete.roditelj(self)
         self.dijete.append(dijete)
-            
+class Cvor:
+    def __init__(self,tabla):
+        self.roditelj=None
+        self.djeca=[]
+        self.pod=tabla
+    def __str__(self):
+        return self.pod
+    def ispitaj_list(self):
+        br=len(self.djeca)
+        return br==0
+    def dodaj_dijete(self,cvor):
+        cvor.roditelj=self
+        self.djeca.append(cvor)
+
 class Stablo:
-    def __init__(self):
-        self.korijen=None
-    def preorder(self,cvor):
-        print(cvor.pod)
-        for child in cvor.dijete:
-            self.preorder(child)
+    def __init__(self,cvor):
+        self.korijen=cvor
+        self.tren_cvor=self.korijen
+    def preorder(self,cvor,proz):
+        pygame.event.pump()
+        cvor.pod.nacrtaj(proz)
+        pygame.display.update()
+        pygame.time.delay(1000)
+        for child in cvor.djeca:
+            self.preorder(child,proz)
 
 
 def testiraj_dek():    
