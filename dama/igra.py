@@ -112,6 +112,7 @@ class Igra:
                                 self.nacrtaj_biranje_moci()
                             return True
                         elif indeks!=-1 and self.tabla.polozaji[indeks]!=0:   #selektovanje druge fig
+                            
                             if self.tabla.polozaji[indeks].boja==self.tren.boja:
                                 print("promjena odabranog")
                                 self.tren=self.tabla.polozaji[indeks]
@@ -130,6 +131,7 @@ class Igra:
                 print("nema nista izabrano")
                 indeks=self.dobij_indeks_od_misa(poz)
                 if indeks!=-1 and self.tabla.polozaji[indeks]!=0:
+                    self.tabla.polozaji[indeks].ispisi_atribute(self.proz)
                     if self.tabla.polozaji[indeks].boja==self.na_redu and self.tabla.polozaji[indeks].zaledjena==0:
                         self.tren=self.tabla.polozaji[indeks]
                         print("izabran "+str(self.tren)+" "+str(self.tren.indeks))
