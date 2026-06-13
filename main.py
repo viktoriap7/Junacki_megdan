@@ -108,6 +108,7 @@ def main():
                 prikaz_igre = False
             if dogadjaj.type==pygame.MOUSEBUTTONDOWN:
                 stablo.preorder(stablo.korijen,PROZOR)
+    rac.upisi_u_fajl()
     pygame.quit()
 main()
 

@@ -1,4 +1,6 @@
+import random
 import time
+import os
 from copy import deepcopy
 from protivnik.zhash import Zobrist_hash
 from dama.figura import Figura
@@ -10,18 +12,44 @@ class Racun:
         self.igra=igra
         self.zhash=Zobrist_hash()
 
-        self.traspoziciona_tabla={}
-        self.max_t_tabla=500000
-
+        self.ime_fajla="t_tabela.txt"
+        self.traspoziciona_tabla=self.ucitaj_iz_fajla()
+        self.max_t_tabela=50000
         self.poc_vrijeme=0
-        self.duzina_razmisljanja=3
+        self.duzina_razmisljanja=40
+    def sacuvaj_u_tabelu(self, h, ocjena, dubina):
+        
+        if len(self.traspoziciona_tabla) >= self.max_t_tabla:
+            svi_kljucevi = list(self.traspoziciona_tabla.keys())
+            kljuc_za_brisanje = random.choice(svi_kljucevi)
+            del self.traspoziciona_tabla[kljuc_za_brisanje]
+        
+        self.traspoziciona_tabla[h] = (ocjena, dubina)
+    def ucitaj_iz_fajla(self):
+        tabela = {}
+        if os.path.exists(self.ime_fajla):
+            with open(self.ime_fajla, 'r') as f:
+                for red in f:
+                    h, score, depth = red.strip().split(',')
+                    tabela[int(h)] = (int(score), int(depth))
+        print("ucitano")
+        return tabela
+    def upisi_u_fajl(self):
+        with open(self.ime_fajla, 'w') as f:
+            for h, podaci in self.traspoziciona_tabla.items():
+                score, depth = podaci
+                # Upisujemo u formatu "hash,score,depth"
+                f.write(f"{h},{score},{depth}\n")
+        print("zapisano")
     def heuristika_izracunaj(self,polozaji):
         ocjena=0
         for fig in polozaji:
             if fig!=0:
                 zbir=50
-                if 0<fig.indeks//4<3:
+                if fig.indeks//4==0:
                     zbir+=10
+                if 0<fig.indeks%4<3:
+                    zbir+=5
                 if fig.marko:
                     zbir+=20
                 if fig.kralj:
@@ -33,11 +61,11 @@ class Racun:
                 if fig.oklop:
                     zbir+=10
                 if fig.oklop_brojac>0:
-                    zbir+=10
+                    zbir+=5
                 if fig.obrve:
                     zbir+=20
                 if fig.zaledjena:
-                    zbir-=10
+                    zbir-=5
 
                 if fig.boja==CRVENA:
                     ocjena+=zbir
@@ -112,7 +140,12 @@ class Racun:
 
         if dubina==0:
             return self.heuristika_izracunaj(polozaji)
-
+        h = self.zhash.izracunaj(polozaji, na_redu)
+        rezultat = self.traspoziciona_tabla.get(h)
+        if rezultat:
+            ocjena, d = rezultat 
+            if d >= dubina:  
+                return ocjena
         if na_redu==CRVENA: #MAX
             max_ocjena=float('-inf')
             
@@ -130,6 +163,7 @@ class Racun:
                 alfa = max(alfa, max_ocjena)
                 if beta <= alfa:
                     break
+            self.traspoziciona_tabla[h] = (max_ocjena,dubina)
             return max_ocjena
         else:   #MIN
             min_ocjena=float('inf')
@@ -148,6 +182,7 @@ class Racun:
                 beta = min(beta, min_ocjena)
                 if beta <= alfa:
                     break
+            self.traspoziciona_tabla[h]=(min_ocjena,dubina)
             return min_ocjena
     def pronadji_najbolji_potez(self):
         #koristi izabranu figuru da vidi da li je lanac
