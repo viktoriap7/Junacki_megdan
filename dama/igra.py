@@ -193,7 +193,7 @@ class Igra:
             self.provjeri_dijagonale_kralja(self.tren,i,osnovni_pravac)
             self.provjeri_dijagonale_kralja(self.tren,i,obrnuti_pravac)
             if self.tren.sarac or self.tren.topuz_brojac: # koristi tvoj naziv atributa iz figure
-                print("Kralj ima relikviju (Šarac/Topuz) - računam posebne korake...")
+               # print("Kralj ima relikviju (Šarac/Topuz) - računam posebne korake...")
                 self.provjeri_dijagonale(self.tren, i, osnovni_pravac)
                 self.provjeri_dijagonale(self.tren, i, obrnuti_pravac)
         #print("\t tren:"+str(self.tren.indeks))

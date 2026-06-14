@@ -16,7 +16,7 @@ class Racun:
         self.traspoziciona_tabla=self.ucitaj_iz_fajla()
         self.max_t_tabela=50000
         self.poc_vrijeme=0
-        self.duzina_razmisljanja=40
+        self.duzina_razmisljanja=90
     def sacuvaj_u_tabelu(self, h, ocjena, dubina):
         
         if len(self.traspoziciona_tabla) >= self.max_t_tabla:
@@ -45,15 +45,15 @@ class Racun:
         ocjena=0
         for fig in polozaji:
             if fig!=0:
-                zbir=50
+                zbir=100
                 if fig.indeks//4==0:
-                    zbir+=10
+                    zbir+=3
                 if 0<fig.indeks%4<3:
-                    zbir+=5
+                    zbir+=3
                 if fig.marko:
                     zbir+=20
                 if fig.kralj:
-                    zbir+=50
+                    zbir+=70
                 if fig.topuz:
                     zbir+=30
                 if fig.sarac:
